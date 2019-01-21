@@ -1,0 +1,58 @@
+﻿<div id="map" class="map"></div>
+<button class="open-button" *ngIf="!show" (click)="openForm()">Show details</button>
+<button class="open-button-details" *ngIf="!showDetails" (click)="openFormDetails()">Show details</button>
+
+<div class="form-popup form-container" id="myForm" *ngIf="show">
+
+    <label><b><input type="checkbox" (change)="interactive($event)" [checked]="interactiveRoute === true"> Interactive</b></label><br />
+
+    <label><b>Start point</b></label>
+    <input type="text" placeholder="Click on the map or write coordinates(lat, lon)" [value]="startLatLon" required>
+
+    <label><b>End point</b></label>
+    <input type="text" placeholder="Click on the map or write coordinates(lat, lon)" [value]="endLatLon" required>
+
+    <button id="btnFindRoute" type="button" (click)="findRoute()" class="btn" [disabled]="disableFind">Find</button>
+    <button type="button" (click)="showOptions = true" class="btn option" *ngIf="!showOptions">Options</button>
+    <div class="form-option" *ngIf="showOptions">
+        <label id="lblOptions" (click)="showOptions = false">Options</label><br />
+        <div class="row">
+            <div class="column">
+                <input type="radio" name="type" value="dijkster" [checked]="type === 'dijkster'" (click)="type = 'dijkster'"> Dijkstra<br />
+                <input type="radio" name="type" value="labelcorrect" [checked]="type === 'labelcorrect'" (click)="type = 'labelcorrect'"> Label Correct<br />
+                <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset'"> Label Set<br />
+                <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster'"> Duplex dijkstra<br />
+                <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar'"> A-Star
+            </div>
+            <div class="column">
+                <input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
+                <input type="radio" name="routeType" value="najrychlejsia" [checked]="routeType === 'najrychlejsia'" (click)="routeType = 'najrychlejsia'"> najrýchlejšia<br>
+                <input type="radio" name="routeType" value="najjednoduchsia" [checked]="routeType === 'najjednoduchsia'" (click)="routeType = 'najjednoduchsia'"> najjednoduchšia
+            </div>
+        </div>
+    </div>
+    <button type="button" (click)="closeForm()" class="btn cancel">Close</button>
+</div>
+
+<div class="form-popup-details form-container" *ngIf="showDetails">
+
+    <table>
+        <tr>
+            <td>Dĺžka cesty:</td>
+            <td>{{data.dlzkaCesty}} metrov</td>
+        </tr>
+        <tr>
+            <td>Čas výpočtu:</td>
+            <td>{{data.casVypoctu}} milisekúnd</td>
+        </tr>
+        <tr>
+            <td>Počet hrán cesty:</td>
+            <td>{{data.pocetHranCesty}}</td>
+        </tr>
+        <tr>
+            <td>Počet navštívených hrán:</td>
+            <td>{{data.pocetNavstivenychHran}}</td>
+        </tr>
+    </table>
+    <button type="button" (click)="closeFormDetails()" class="btn cancel">Close</button>
+</div>
