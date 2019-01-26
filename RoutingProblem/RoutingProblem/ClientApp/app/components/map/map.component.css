@@ -60,6 +60,27 @@ td {
     width: 310px;
 }
 
+.route {
+    border: none;
+    background-color: white;
+    margin: 0 auto;
+    display: flex;
+}
+
+.labelRoute {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#left:disabled {
+    color: gray;
+}
+
+#right:disabled {
+    color: gray;
+}
+
 /* The popup form - hidden by default */
 .form-popup {
     position: fixed;

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RoutingProblem.Data;
 using RoutingProblem.Models;
 using RoutingProblem.Services;
 
@@ -20,11 +21,12 @@ namespace RoutingProblem.Controllers
         LabelCorrect labelCorrect = new LabelCorrect();
         LabelSet labelSet = new LabelSet();
         DuplexDijkster duplexDijkster = new DuplexDijkster();
+        MultiLabel multiLabel = new MultiLabel();
         TimeSpan timeItTook;
 
     [HttpGet]
         [Route("dijkster/{startLatLon}/{endLatLon}")]
-        public Route Dijkster(string startLatLon, string endLatLon)
+        public Routes Dijkster(string startLatLon, string endLatLon)
         {
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
@@ -35,7 +37,7 @@ namespace RoutingProblem.Controllers
 
         [HttpGet]
         [Route("astar/{startLatLon}/{endLatLon}")]
-        public Route AStar(string startLatLon, string endLatLon)
+        public Routes AStar(string startLatLon, string endLatLon)
         {
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
@@ -46,7 +48,7 @@ namespace RoutingProblem.Controllers
 
         [HttpGet]
         [Route("labelcorrect/{startLatLon}/{endLatLon}")]
-        public Route LabelCorrect(string startLatLon, string endLatLon)
+        public Routes LabelCorrect(string startLatLon, string endLatLon)
         {
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
@@ -57,7 +59,7 @@ namespace RoutingProblem.Controllers
 
         [HttpGet]
         [Route("labelset/{startLatLon}/{endLatLon}")]
-        public Route LabelSet(string startLatLon, string endLatLon)
+        public Routes LabelSet(string startLatLon, string endLatLon)
         {
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
@@ -68,13 +70,25 @@ namespace RoutingProblem.Controllers
 
         [HttpGet]
         [Route("duplexdijkster/{startLatLon}/{endLatLon}")]
-        public Route DuplexDijkster(string startLatLon, string endLatLon)
+        public Routes DuplexDijkster(string startLatLon, string endLatLon)
         {
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = duplexDijkster.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
             timeItTook = DateTime.Now - start;
             return AfterCalculateShortestPathDuplex(node);
+        }
+
+        [HttpGet]
+        [Route("multilabel/{startLatLon}/{endLatLon}")]
+        public Routes MultiLabel(string startLatLon, string endLatLon)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
+            multiLabel.K = 2;
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = multiLabel.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
+            timeItTook = DateTime.Now - start;
+            return AfterCalculateShortestPathMultiLabel(node);
         }
 
         private KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> BeforeCalculateShortestPath(string startLatLon, string endLatLon)
@@ -111,7 +125,7 @@ namespace RoutingProblem.Controllers
             return new KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>>(startNode, endNode);
         }
 
-        private Route AfterCalculateShortestPath(NodeGraphDTO nodeCon)
+        private Routes AfterCalculateShortestPath(NodeGraphDTO nodeCon)
         {
             NodeGraphDTO node = nodeCon;
             LinkedList<NodeLocationDTO> nodeRoute = new LinkedList<NodeLocationDTO>();
@@ -125,17 +139,21 @@ namespace RoutingProblem.Controllers
                 node = node.PreviousNode;
             }
 
-            return new Route()
+            Route route = new Route()
             {
                 PocetHranCesty = nodeRoute.Count,
                 PocetNavstivenychHran = Utils.PocetNavstivenychHran,
                 DlzkaCesty = Math.Round(nodeCon.CurrentDistance, 5),
                 CasVypoctu = timeItTook.Milliseconds,
-                nodes = nodeRoute
+                Nodes = nodeRoute
             };
+
+            Routes routes = new Routes();
+            routes.Route.AddLast(route);
+            return routes;
         }
 
-        private Route AfterCalculateShortestPathDuplex(NodeGraphDTO nodeCon)
+        private Routes AfterCalculateShortestPathDuplex(NodeGraphDTO nodeCon)
         {
             NodeGraphDTO node = nodeCon;
             LinkedList<NodeLocationDTO> nodeRoute = new LinkedList<NodeLocationDTO>();
@@ -160,14 +178,54 @@ namespace RoutingProblem.Controllers
                 node = node.PreviousNodeR;
             }
 
-            return new Route()
+            Route route = new Route()
             {
                 PocetHranCesty = nodeRoute.Count,
                 PocetNavstivenychHran = Utils.PocetNavstivenychHran,
                 DlzkaCesty = Math.Round(nodeCon.CurrentDistance, 5),
                 CasVypoctu = timeItTook.Milliseconds,
-                nodes = nodeRoute
+                Nodes = nodeRoute
             };
+
+            Routes routes = new Routes();
+            routes.Route.AddLast(route);
+            return routes;
+        }
+
+        private Routes AfterCalculateShortestPathMultiLabel(NodeGraphDTO nodeCon)
+        {
+            Routes routes = new Routes();
+
+            foreach (MultiLabelMark n in nodeCon.MultiLabelMark)
+            {
+                int k = n.K;
+                int xk = k;
+                NodeGraphDTO node = nodeCon;
+                Route route = null;
+                LinkedList<NodeLocationDTO> nodeRoute = new LinkedList<NodeLocationDTO>();
+                while (xk != 0)
+                {
+                    nodeRoute.AddLast(new NodeLocationDTO()
+                    {
+                        Lat = node.Node.Lat,
+                        Lon = node.Node.Lon
+                    });
+                    xk = node.MultiLabelMark[k - 1].Xk;
+                    node = node.MultiLabelMark[k - 1].X;
+                    k = xk;
+                }
+
+                route = new Route()
+                {
+                    PocetHranCesty = nodeRoute.Count,
+                    PocetNavstivenychHran = Utils.PocetNavstivenychHran,
+                    DlzkaCesty = Math.Round(nodeCon.MultiLabelMark[n.K - 1].T, 5),
+                    CasVypoctu = timeItTook.Milliseconds,
+                    Nodes = nodeRoute
+                };
+                routes.Route.AddLast(route);
+            }
+            return routes;
         }
     }
 }

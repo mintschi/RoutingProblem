@@ -7,6 +7,7 @@ import { IRoute } from '../../services/interfaces/IRoute';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import { style } from '@angular/animations';
+import { IRoutes } from '../../services/interfaces/IRoutes';
 import { IData } from '../../services/interfaces/IData';
 
 declare var ol: any;
@@ -135,7 +136,10 @@ export class MapComponent implements OnInit {
     public points: Array<any> = [];
     public featureLineStart: any;
     public featureLineEnd: any;
-    public data: IData = new Object() as IData;
+    public routes: IRoutes = new Object() as IRoutes;
+    public route: IData = new Object() as IData;
+    public idRoute: any = 0;
+    public routesCount: any = 0;
     findRoute() {
         this.map.removeLayer(this.routeLayer);
         this.points = new Array();
@@ -148,9 +152,11 @@ export class MapComponent implements OnInit {
             }
         });
         this.service.findRoute(this.type, this.routeType, this.startLatLon, this.endLatLon)
-            .then((route: IData) => {
-                this.points = route.nodes;
-                this.data = route;
+            .then((route: IRoutes) => {
+                this.route = route.route[this.idRoute];
+                this.points = this.route.nodes;
+                this.routes = route;
+                this.routesCount = route.route.length - 1;
             })
             .then(() => {
                 this.points.forEach((value: any) => {
@@ -179,6 +185,24 @@ export class MapComponent implements OnInit {
 
     interactive(evt: any) {
         this.interactiveRoute = evt.target.checked;
+    }
+
+    betterRoute() {
+        if (this.idRoute > 0) {
+            this.idRoute--;
+            this.findRoute();
+        }
+        //var button = this.idRoute == 0 ? (<HTMLInputElement>document.getElementById("left")).disabled = true
+        //    : (<HTMLInputElement>document.getElementById("left")).disabled = false;
+    }
+
+    worseRoute() {
+        if (this.idRoute < this.routes.route.length - 1) {
+            this.idRoute++;
+            this.findRoute();
+        } 
+        //var button = this.idRoute == this.routes.route.length - 1 ? (<HTMLInputElement>document.getElementById("right")).disabled = true
+        //    : (<HTMLInputElement>document.getElementById("right")).disabled = false;
     }
 
     openForm() {

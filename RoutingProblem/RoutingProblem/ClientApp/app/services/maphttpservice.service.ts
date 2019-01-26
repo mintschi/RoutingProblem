@@ -2,7 +2,7 @@
 import { Http, HttpModule, Response } from '@angular/http';
 import { IRoute } from './interfaces/IRoute';
 import 'rxjs/add/operator/toPromise';
-import { IData } from './interfaces/IData';
+import { IRoutes } from './interfaces/IRoutes';
 
 @Injectable()
 export class MapHttpService {
@@ -10,7 +10,7 @@ export class MapHttpService {
 
     findRoute(type: string, routeType: string, startLatLon: string, endLatLon: string): Promise<any> {
         return this._http.get('/api/Route/' + type + '/' + startLatLon + '/' + endLatLon + '/')
-            .map((response: Response) => response.json() as IData)
+            .map((response: Response) => response.json() as IRoutes)
             .toPromise();
     }
 }

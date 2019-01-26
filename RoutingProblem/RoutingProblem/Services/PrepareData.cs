@@ -55,6 +55,7 @@ namespace RoutingProblem.Services
                 n.Value.FScore = Double.MaxValue;
                 n.Value.PreviousNodeR = null;
                 n.Value.CurrentDistanceR = Double.MaxValue;
+                n.Value.MultiLabelMark.Clear();
             }
             Utils.PocetNavstivenychHran = 0;
         }

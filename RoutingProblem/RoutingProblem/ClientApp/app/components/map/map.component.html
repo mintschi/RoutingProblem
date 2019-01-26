@@ -22,7 +22,8 @@
                 <input type="radio" name="type" value="labelcorrect" [checked]="type === 'labelcorrect'" (click)="type = 'labelcorrect'"> Label Correct<br />
                 <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset'"> Label Set<br />
                 <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster'"> Duplex dijkstra<br />
-                <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar'"> A-Star
+                <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar'"> A-Star<br />
+                <input type="radio" name="type" value="multilabel" [checked]="type === 'multilabel'" (click)="type = 'multilabel'"> Multi Label
             </div>
             <div class="column">
                 <input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
@@ -36,22 +37,29 @@
 
 <div class="form-popup-details form-container" *ngIf="showDetails">
 
+    <div class="route">
+        <button id="left" type="button" (click)="betterRoute()" class="route" [disabled]="idRoute === 0" *ngIf="routesCount > 0"><b><<</b></button>
+        <label class="labelRoute" *ngIf="routesCount <= 0"><b>Route</b></label>
+        <label class="labelRoute" *ngIf="routesCount > 0"><b>Route {{idRoute+1}}</b></label>
+        <button id="right" type="button" (click)="worseRoute()" class="route" [disabled]="idRoute === routesCount" *ngIf="routesCount > 0"><b>>></b></button>
+    </div>
+
     <table>
         <tr>
             <td>Dĺžka cesty:</td>
-            <td>{{data.dlzkaCesty}} metrov</td>
+            <td>{{route.dlzkaCesty}} metrov</td>
         </tr>
         <tr>
             <td>Čas výpočtu:</td>
-            <td>{{data.casVypoctu}} milisekúnd</td>
+            <td>{{route.casVypoctu}} milisekúnd</td>
         </tr>
         <tr>
             <td>Počet hrán cesty:</td>
-            <td>{{data.pocetHranCesty}}</td>
+            <td>{{route.pocetHranCesty}}</td>
         </tr>
         <tr>
             <td>Počet navštívených hrán:</td>
-            <td>{{data.pocetNavstivenychHran}}</td>
+            <td>{{route.pocetNavstivenychHran}}</td>
         </tr>
     </table>
     <button type="button" (click)="closeFormDetails()" class="btn cancel">Close</button>
