@@ -21,19 +21,19 @@ declare var ol: any;
 
 export class MapComponent implements OnInit {
     public show: boolean = true;
-    public showDetails: boolean = true;
     public startLatLon: string = "";
     public endLatLon: string = "";
     public disableFind: boolean = true;
     public vector: any;
     public routeLayer: any;
-    public showOptions: boolean = false;
     public type: string = "dijkster";
     public routeType: string = "najkratsia";
     public map: any;
     public startPointFeature: any;
     public endPointFeature: any;
     public interactiveRoute: boolean = true;
+    public kRoutes: string = "";
+    private source: any;
 
     constructor(private service: MapHttpService) { }
 
@@ -47,6 +47,7 @@ export class MapComponent implements OnInit {
         });
 
         var source = new ol.source.Vector({ wrapX: false });
+        this.source = source;
 
         this.vector = new ol.layer.Vector({
             source: source,
@@ -122,14 +123,7 @@ export class MapComponent implements OnInit {
         this.map.addInteraction(modify);
 
         modify.on("modifyend", (evt: any) => {
-            if (!this.disableFind && this.routeLayer != null) {
-                if (this.interactiveRoute) {
-                    this.map.removeLayer(this.routeLayer);
-                    this.featureLineStart = null;
-                    this.featureLineEnd = null;
-                    this.findRoute();
-                }
-            }
+            this.modifyend();
         });
     }
 
@@ -139,8 +133,13 @@ export class MapComponent implements OnInit {
     public routes: IRoutes = new Object() as IRoutes;
     public route: IData = new Object() as IData;
     public idRoute: any = 0;
-    public routesCount: any = 0;
+    public routesCount: any = -1;
     findRoute() {
+        try {
+            this.kRoutes = (<HTMLInputElement>document.getElementById("k")).value;
+        } catch(e) {
+
+        }
         this.map.removeLayer(this.routeLayer);
         this.points = new Array();
         var points: Array<any> = new Array();
@@ -151,7 +150,7 @@ export class MapComponent implements OnInit {
                 return this.getStyle(feature.get('type'));
             }
         });
-        this.service.findRoute(this.type, this.routeType, this.startLatLon, this.endLatLon)
+        this.service.findRoute(this.type, this.routeType, this.startLatLon, this.endLatLon, this.kRoutes)
             .then((route: IRoutes) => {
                 this.route = route.route[this.idRoute];
                 this.points = this.route.nodes;
@@ -183,8 +182,35 @@ export class MapComponent implements OnInit {
             })
     }
 
+    modifyend() {
+        if (!this.disableFind && this.routeLayer != null) {
+            if (this.interactiveRoute) {
+                this.map.removeLayer(this.routeLayer);
+                this.featureLineStart = null;
+                this.featureLineEnd = null;
+                this.findRoute();
+            }
+        }
+    }
+
     interactive(evt: any) {
         this.interactiveRoute = evt.target.checked;
+        if (this.interactiveRoute == true) {
+            this.modifyend();
+        }
+    }
+
+    changeStartEnd() {
+        if (this.source.getFeatures().length > 1) {
+            let s = this.startLatLon.split(",");
+            let e = this.endLatLon.split(",");
+            let startLatLon = this.startLatLon;
+            this.startLatLon = this.endLatLon;
+            this.endLatLon = startLatLon;
+            this.source.getFeatures()[0].getGeometry().setCoordinates(ol.proj.transform([+e[1], +e[0]], 'EPSG:4326', 'EPSG:3857'));
+            this.source.getFeatures()[0].getGeometry().setCoordinates(ol.proj.transform([+s[1], +s[0]], 'EPSG:4326', 'EPSG:3857'));
+            this.modifyend();
+        }
     }
 
     betterRoute() {
@@ -192,8 +218,6 @@ export class MapComponent implements OnInit {
             this.idRoute--;
             this.findRoute();
         }
-        //var button = this.idRoute == 0 ? (<HTMLInputElement>document.getElementById("left")).disabled = true
-        //    : (<HTMLInputElement>document.getElementById("left")).disabled = false;
     }
 
     worseRoute() {
@@ -201,24 +225,14 @@ export class MapComponent implements OnInit {
             this.idRoute++;
             this.findRoute();
         } 
-        //var button = this.idRoute == this.routes.route.length - 1 ? (<HTMLInputElement>document.getElementById("right")).disabled = true
-        //    : (<HTMLInputElement>document.getElementById("right")).disabled = false;
     }
 
     openForm() {
         this.show = true;
     }
 
-    openFormDetails() {
-        this.showDetails = true;
-    }
-
     closeForm() {
         this.show = false;
-    }
-
-    closeFormDetails() {
-        this.showDetails = false;
     }
 
     getStyle(style: any) {

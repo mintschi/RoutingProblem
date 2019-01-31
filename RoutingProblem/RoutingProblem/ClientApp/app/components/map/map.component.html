@@ -1,57 +1,44 @@
 ﻿<div id="map" class="map"></div>
-<button class="open-button" *ngIf="!show" (click)="openForm()">Show details</button>
-<button class="open-button-details" *ngIf="!showDetails" (click)="openFormDetails()">Show details</button>
+<!--<label class="open-button" *ngIf="!show" (click)="openForm()"></label>-->
+<button type="button" (click)="openForm()" class="name labelRoute open-button" *ngIf="!show">
+    <label>Problémy trasovania v rozsiahlych sietach</label>
+    <span>
+        <div class="menu"></div>
+        <div class="menu"></div>
+        <div class="menu"></div>
+    </span>
+</button>
+
 
 <div class="form-popup form-container" id="myForm" *ngIf="show">
 
-    <label><b><input type="checkbox" (change)="interactive($event)" [checked]="interactiveRoute === true"> Interactive</b></label><br />
-
-    <label><b>Start point</b></label>
-    <input type="text" placeholder="Click on the map or write coordinates(lat, lon)" [value]="startLatLon" required>
-
-    <label><b>End point</b></label>
-    <input type="text" placeholder="Click on the map or write coordinates(lat, lon)" [value]="endLatLon" required>
-
-    <button id="btnFindRoute" type="button" (click)="findRoute()" class="btn" [disabled]="disableFind">Find</button>
-    <button type="button" (click)="showOptions = true" class="btn option" *ngIf="!showOptions">Options</button>
-    <div class="form-option" *ngIf="showOptions">
-        <label id="lblOptions" (click)="showOptions = false">Options</label><br />
-        <div class="row">
-            <div class="column">
-                <input type="radio" name="type" value="dijkster" [checked]="type === 'dijkster'" (click)="type = 'dijkster'"> Dijkstra<br />
-                <input type="radio" name="type" value="labelcorrect" [checked]="type === 'labelcorrect'" (click)="type = 'labelcorrect'"> Label Correct<br />
-                <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset'"> Label Set<br />
-                <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster'"> Duplex dijkstra<br />
-                <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar'"> A-Star<br />
-                <input type="radio" name="type" value="multilabel" [checked]="type === 'multilabel'" (click)="type = 'multilabel'"> Multi Label
-            </div>
-            <div class="column">
-                <input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
-                <input type="radio" name="routeType" value="najrychlejsia" [checked]="routeType === 'najrychlejsia'" (click)="routeType = 'najrychlejsia'"> najrýchlejšia<br>
-                <input type="radio" name="routeType" value="najjednoduchsia" [checked]="routeType === 'najjednoduchsia'" (click)="routeType = 'najjednoduchsia'"> najjednoduchšia
-            </div>
-        </div>
+    <div class="name">
+        <label>Problémy trasovania v rozsiahlych sietach</label>
+        <button type="button" (click)="closeForm()" class="labelRoute"><b>>></b></button>
     </div>
-    <button type="button" (click)="closeForm()" class="btn cancel">Close</button>
-</div>
-
-<div class="form-popup-details form-container" *ngIf="showDetails">
 
     <div class="route">
-        <button id="left" type="button" (click)="betterRoute()" class="route" [disabled]="idRoute === 0" *ngIf="routesCount > 0"><b><<</b></button>
-        <label class="labelRoute" *ngIf="routesCount <= 0"><b>Route</b></label>
-        <label class="labelRoute" *ngIf="routesCount > 0"><b>Route {{idRoute+1}}</b></label>
-        <button id="right" type="button" (click)="worseRoute()" class="route" [disabled]="idRoute === routesCount" *ngIf="routesCount > 0"><b>>></b></button>
+        <button type="button" (click)="betterRoute()" class="labelRoute" [disabled]="idRoute === 0" *ngIf="routesCount > 0"><b><</b></button>
+        <h2 class="labelRoute"><b>Trasa <span *ngIf="routesCount > 0">{{idRoute+1}}</span></b></h2>
+        <button type="button" (click)="worseRoute()" class="labelRoute" [disabled]="idRoute === routesCount" *ngIf="routesCount > 0"><b>></b></button>
+    </div>
+
+    <div class="coordinates">
+        <img class="image" src="mapMarkerChange.png" (click)="changeStartEnd()" alt="change" width="30" height="92" title="Zmeniť začiatok a cieľ jazdy">
+        <div class="coordinates-text">
+            <input type="text" placeholder="Zvoľte začiatok trasy kliknutím na mapu" [value]="startLatLon" required>
+            <input type="text" placeholder="Zvoľte cieľ trasy kliknutím na mapu" [value]="endLatLon" required>
+        </div>
     </div>
 
     <table>
         <tr>
-            <td>Dĺžka cesty:</td>
-            <td>{{route.dlzkaCesty}} metrov</td>
+            <td width="50%">Dĺžka cesty:</td>
+            <td>{{route.dlzkaCesty}} <span *ngIf="routesCount > -1">metrov</span></td>
         </tr>
         <tr>
             <td>Čas výpočtu:</td>
-            <td>{{route.casVypoctu}} milisekúnd</td>
+            <td>{{route.casVypoctu}} <span *ngIf="routesCount > -1">milisekúnd</span></td>
         </tr>
         <tr>
             <td>Počet hrán cesty:</td>
@@ -62,5 +49,35 @@
             <td>{{route.pocetNavstivenychHran}}</td>
         </tr>
     </table>
-    <button type="button" (click)="closeFormDetails()" class="btn cancel">Close</button>
+
+    <div class="form-option">
+        <label id="lblOptions">Možnosti</label><br />
+        <div class="option">
+            <label>Algoritmus:</label><br />
+            <div class="row">
+                <div class="column">
+                    <input type="radio" name="type" value="dijkster" [checked]="type === 'dijkster'" (click)="type = 'dijkster';modifyend();"> Dijkstra<br />
+                    <input type="radio" name="type" value="labelcorrect" [checked]="type === 'labelcorrect'" (click)="type = 'labelcorrect';modifyend();"> Label Correct<br />
+                    <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset';modifyend();"> Label Set<br />
+                    <label id="pocet-tras" *ngIf="type === 'multilabel'">Počet trás:</label>
+                </div>
+                <div class="column">
+                    <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster';modifyend();"> Duplex dijkstra<br />
+                    <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar';modifyend();"> A-Star<br />
+                    <input type="radio" name="type" value="multilabel" [checked]="type === 'multilabel'" (click)="type = 'multilabel'"> Multi Label<br />
+                    <input id="k" type="text" *ngIf="type === 'multilabel'" (blur)="modifyend()" required>
+                    <!--<input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
+                    <input type="radio" name="routeType" value="najrychlejsia" [checked]="routeType === 'najrychlejsia'" (click)="routeType = 'najrychlejsia'"> najrýchlejšia<br>
+                    <input type="radio" name="routeType" value="najjednoduchsia" [checked]="routeType === 'najjednoduchsia'" (click)="routeType = 'najjednoduchsia'"> najjednoduchšia-->
+                </div>
+            </div>
+            <label>Interaktívne hľadanie trasy:</label><br />
+            <div class="column">
+                <label class="interactive"><input type="checkbox" (change)="interactive($event)" [checked]="interactiveRoute === true"> Automaticky vyhľadať</label><br />
+            </div>
+        </div>
+    </div>
+    <!--<div class="div-find">-->
+        <button id="btnFindRoute" type="button" (click)="findRoute()" class="btn" [disabled]="disableFind" *ngIf="interactiveRoute === false">Find</button>
+    <!--</div>-->
 </div>

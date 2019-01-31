@@ -1,7 +1,7 @@
 ﻿html, body, #map {
     padding: 0;
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    border: none;
 }
 
 #map {
@@ -9,19 +9,120 @@
     height: 100vh;
 }
 
-#lblOptions {
-    background-color: blue;
-    color: white;
-    padding: 16px 20px;
-    border: none;
+.open-button {
     cursor: pointer;
-    width: 100%;
     opacity: 0.8;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    width: 360px;
+    height: 90px;
+}
+
+    .open-button span {
+        padding-left: 5px;
+        padding-top: 10px;
+    }
+
+.menu {
+    width: 30px;
+    height: 5px;
+    background: white;
+    margin: 6px 0;
+}
+
+.form-popup {
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    z-index: 9;
+    width: auto;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+    -webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        border-radius: 10px;
+        background-color: #F5F5F5;
+    }
+
+    -webkit-scrollbar {
+        width: 12px;
+        background-color: #F5F5F5;
+    }
+
+    -webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        background-color: #555;
+    }
+
+.name {
+    background: #4D4D4D;
+    color: darkgray;
+    text-transform: uppercase;
+    padding: 16px 10px;
+    font-size: 20px;
+    margin: 0px;
+    display: flex;
+    text-align: center;
+}
+
+    .name button {
+        background: #4D4D4D;
+    }
+
+.route {
+    background-color: dimgray;
+    color: white;
+    text-transform: uppercase;
+    border: none;
+    display: flex;
+    padding-bottom: 5px;
+    position: sticky;
+}
+
+.route button {
+    padding-top: 10px;
+}
+
+.labelRoute {
+    margin-left: auto;
+    margin-right: auto;
+    background: dimgray;
+    border: none;
+    font-size: 18px;
+}
+
+    .labelRoute:disabled {
+        color: dimgray
+    }
+
+.coordinates {
+    display: flex;
+    padding: 5px;
+}
+
+.coordinates-text {
+    width: 100%;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.image {
+    display: block;
+    margin-bottom: auto;
+    margin-top: auto;
+    margin-left: 10px;
+    cursor: pointer;
 }
 
 table {
     width: 100%;
     margin-bottom: 10px;
+    margin-left: 10px;
 }
 
 td {
@@ -29,87 +130,23 @@ td {
     padding-top: 5px;
 }
 
-* {
-    box-sizing: border-box;
-}
-
-/* Button used to open the contact form - fixed at the bottom of the page */
-.open-button {
-    background-color: #555;
+#lblOptions {
+    background-color: dimgray;
     color: white;
-    padding: 16px 20px;
+    padding: 16px 10px;
     border: none;
-    cursor: pointer;
+    width: 100%;
     opacity: 0.8;
-    position: fixed;
-    top: 23px;
-    right: 28px;
-    width: 310px;
-}
-
-.open-button-details {
-    background-color: #555;
-    color: white;
-    padding: 16px 20px;
-    border: none;
-    cursor: pointer;
-    opacity: 0.8;
-    position: fixed;
-    bottom: 23px;
-    right: 28px;
-    width: 310px;
-}
-
-.route {
-    border: none;
-    background-color: white;
-    margin: 0 auto;
-    display: flex;
-}
-
-.labelRoute {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-}
-
-#left:disabled {
-    color: gray;
-}
-
-#right:disabled {
-    color: gray;
-}
-
-/* The popup form - hidden by default */
-.form-popup {
-    position: fixed;
-    right: 15px;
-    top: 15px;
-    border: 3px solid #f1f1f1;
-    z-index: 9;
-}
-
-.form-popup-details {
-    position: fixed;
-    right: 15px;
-    bottom: 15px;
-    border: 3px solid #f1f1f1;
-    z-index: 9;
-    width: 330px;
-}
-
-/* Add styles to the form container */
-.form-container {
-    max-width: 330px;
-    padding: 10px;
-    background-color: white;
 }
 
 .form-option {
-    max-width: 330px;
-    background-color: cornflowerblue;
-    margin-bottom: 10px;
+    display: block;
+    background-color: darkgray;
+    margin-bottom: auto;
+}
+
+.option {
+    padding-left: 10px;
 }
 
 .row {
@@ -122,20 +159,38 @@ td {
     width: 50%;
 }
 
-    /* Full-width input fields */
-    .form-container input[type=text], .form-container input[type=password] {
-        width: 100%;
-        padding: 15px;
-        margin: 5px 0 22px 0;
-        border: none;
-        background: #f1f1f1;
-    }
+#k {
+    width: 150px;
+    height: 30px;
+    margin-top: 2px;
+}
 
-        /* When the inputs get focus, do something */
-        .form-container input[type=text]:focus, .form-container input[type=password]:focus {
-            background-color: #ddd;
-            outline: none;
-        }
+#pocet-tras {
+    display: block;
+    padding-top: 10px;
+}
+
+/* Add styles to the form container */
+.form-container {
+    max-width: 360px;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+.form-container input[type="text"] {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    outline: none;
+    display: block;
+    width: 100%;
+    padding: 7px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    background: transparent;
+    margin-bottom: 10px;
+    height: 45px;
+}
 
     /* Set a style for the submit/login button */
     .form-container .btn {
@@ -145,17 +200,9 @@ td {
         border: none;
         cursor: pointer;
         width: 100%;
+        margin-top: auto;
         margin-bottom: 10px;
         opacity: 0.8;
-    }
-
-    /* Add a red background color to the cancel button */
-    .form-container .cancel {
-        background-color: red;
-    }
-
-    .form-container .option {
-        background-color: blue;
     }
 
     /* Add some hover effects to buttons */
@@ -165,5 +212,11 @@ td {
 
     .form-container .btn:disabled {
         background-color: #cccccc;
-        color: #666666;
+        color: #666666; 
+        cursor: default;
     }
+
+.interactive {
+    font-weight: normal;
+    padding-left: 5px;
+}

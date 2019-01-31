@@ -8,9 +8,15 @@ import { IRoutes } from './interfaces/IRoutes';
 export class MapHttpService {
     constructor(private _http: Http) { }
 
-    findRoute(type: string, routeType: string, startLatLon: string, endLatLon: string): Promise<any> {
-        return this._http.get('/api/Route/' + type + '/' + startLatLon + '/' + endLatLon + '/')
-            .map((response: Response) => response.json() as IRoutes)
-            .toPromise();
+    findRoute(type: string, routeType: string, startLatLon: string, endLatLon: string, kRoutes: string): Promise<any> {
+        if (type === "multilabel") {
+            return this._http.get('/api/Route/' + type + '/' + startLatLon + '/' + endLatLon + '/' + kRoutes + '/')
+                .map((response: Response) => response.json() as IRoutes)
+                .toPromise();
+        } else {
+            return this._http.get('/api/Route/' + type + '/' + startLatLon + '/' + endLatLon + '/')
+                .map((response: Response) => response.json() as IRoutes)
+                .toPromise();
+        }
     }
 }

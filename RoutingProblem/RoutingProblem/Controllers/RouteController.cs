@@ -80,11 +80,11 @@ namespace RoutingProblem.Controllers
         }
 
         [HttpGet]
-        [Route("multilabel/{startLatLon}/{endLatLon}")]
-        public Routes MultiLabel(string startLatLon, string endLatLon)
+        [Route("multilabel/{startLatLon}/{endLatLon}/{k}")]
+        public Routes MultiLabel(string startLatLon, string endLatLon, string k)
         {
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
-            multiLabel.K = 2;
+            multiLabel.K = Int32.Parse(k);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = multiLabel.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
             timeItTook = DateTime.Now - start;
