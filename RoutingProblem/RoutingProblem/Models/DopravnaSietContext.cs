@@ -19,6 +19,7 @@ namespace RoutingProblem.Models
 
         public virtual DbSet<Edge> Edge { get; set; }
         public virtual DbSet<Node> Node { get; set; }
+        public virtual DbSet<DisabledMovement> DisabledMovement { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -80,6 +81,36 @@ namespace RoutingProblem.Models
                 entity.Property(e => e.Lat).HasColumnName("lat");
 
                 entity.Property(e => e.Lon).HasColumnName("lon");
+            });
+
+            modelBuilder.Entity<DisabledMovement>(entity =>
+            {
+                entity.HasKey(e => e.IdDisabledMovement)
+                    .HasName("PK__Disabled__CD0366550AB8EF84");
+
+                entity.Property(e => e.IdDisabledMovement)
+                    .HasColumnName("id_disabled_movement")
+                    .HasColumnType("decimal(11, 0)");
+
+                entity.Property(e => e.StartEdge)
+                    .HasColumnName("start_edge")
+                    .HasColumnType("decimal(11, 0)");
+
+                entity.Property(e => e.EndEdge)
+                    .HasColumnName("end_edge")
+                    .HasColumnType("decimal(11, 0)");
+
+                entity.HasOne(d => d.StartEdgeNavigation)
+                    .WithMany(p => p.DisabledMovementStartEdgeNavigation)
+                    .HasForeignKey(d => d.StartEdge)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__DisabledM__start__08B54D69");
+
+                entity.HasOne(d => d.EndEdgeNavigation)
+                    .WithMany(p => p.DisabledMovementEndEdgeNavigation)
+                    .HasForeignKey(d => d.EndEdge)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__DisabledM__end_e__09A971A2");
             });
         }
     }

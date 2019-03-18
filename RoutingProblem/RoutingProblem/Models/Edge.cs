@@ -13,5 +13,7 @@ namespace RoutingProblem.Models
 
         public virtual Node EndNodeNavigation { get; set; }
         public virtual Node StartNodeNavigation { get; set; }
+        public virtual ICollection<DisabledMovement> DisabledMovementEndEdgeNavigation { get; set; }
+        public virtual ICollection<DisabledMovement> DisabledMovementStartEdgeNavigation { get; set; }
     }
 }

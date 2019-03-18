@@ -16,6 +16,7 @@ namespace RoutingProblem.Controllers
     public class RouteController : Controller
     {
         DopravnaSietContext dopravnaSietContext = new DopravnaSietContext();
+        Zakladny zakladny = new Zakladny();
         Dijkster dijkster = new Dijkster();
         AStar astar = new AStar();
         LabelCorrect labelCorrect = new LabelCorrect();
@@ -24,7 +25,18 @@ namespace RoutingProblem.Controllers
         MultiLabel multiLabel = new MultiLabel();
         TimeSpan timeItTook;
 
-    [HttpGet]
+        [HttpGet]
+        [Route("zakladny/{startLatLon}/{endLatLon}")]
+        public Routes Zakladny(string startLatLon, string endLatLon)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = zakladny.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value, PrepareData.NodesGraph);
+            timeItTook = DateTime.Now - start;
+            return AfterCalculateShortestPath(node);
+        }
+
+        [HttpGet]
         [Route("dijkster/{startLatLon}/{endLatLon}")]
         public Routes Dijkster(string startLatLon, string endLatLon)
         {
@@ -91,42 +103,154 @@ namespace RoutingProblem.Controllers
             return AfterCalculateShortestPathMultiLabel(node);
         }
 
+        [HttpGet]
+        [Route("dijkster/disabled/{startLatLon}/{endLatLon}")]
+        public Routes DijksterDisabled(string startLatLon, string endLatLon)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>> nodes = BeforeCalculateDisabledShortestPath(startLatLon, endLatLon);
+            PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = dijkster.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
+            timeItTook = DateTime.Now - start;
+            Routes routes = AfterCalculateShortestPath(node);
+            PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
+            return routes;
+        }
+
+        [HttpGet]
+        [Route("astar/disabled/{startLatLon}/{endLatLon}")]
+        public Routes AStarDisabled(string startLatLon, string endLatLon)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>> nodes = BeforeCalculateDisabledShortestPath(startLatLon, endLatLon);
+            PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = astar.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
+            timeItTook = DateTime.Now - start;
+            Routes routes = AfterCalculateShortestPath(node);
+            PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
+            return routes;
+        }
+
+        [HttpGet]
+        [Route("labelcorrect/disabled/{startLatLon}/{endLatLon}")]
+        public Routes LabelCorrectDisabled(string startLatLon, string endLatLon)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>> nodes = BeforeCalculateDisabledShortestPath(startLatLon, endLatLon);
+            PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = labelCorrect.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
+            timeItTook = DateTime.Now - start;
+            Routes routes = AfterCalculateShortestPath(node);
+            PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
+            return routes;
+        }
+
+        [HttpGet]
+        [Route("labelset/disabled/{startLatLon}/{endLatLon}")]
+        public Routes LabelSetDisabled(string startLatLon, string endLatLon)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>> nodes = BeforeCalculateDisabledShortestPath(startLatLon, endLatLon);
+            PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = labelSet.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
+            timeItTook = DateTime.Now - start;
+            Routes routes = AfterCalculateShortestPath(node);
+            PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
+            return routes;
+        }
+
+        [HttpGet]
+        [Route("duplexdijkster/disabled/{startLatLon}/{endLatLon}")]
+        public Routes DuplexDijksterDisabled(string startLatLon, string endLatLon)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>> nodes = BeforeCalculateDisabledShortestPath(startLatLon, endLatLon);
+            PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = duplexDijkster.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
+            timeItTook = DateTime.Now - start;
+            Routes routes = AfterCalculateShortestPathDuplex(node);
+            PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
+            return routes;
+        }
+
+        [HttpGet]
+        [Route("multilabel/disabled/{startLatLon}/{endLatLon}/{k}")]
+        public Routes MultiLabelDIsabled(string startLatLon, string endLatLon, string k)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>> nodes = BeforeCalculateDisabledShortestPath(startLatLon, endLatLon);
+            PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
+            multiLabel.K = Int32.Parse(k);
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = multiLabel.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
+            timeItTook = DateTime.Now - start;
+            Routes routes = AfterCalculateShortestPathMultiLabel(node);
+            PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
+            return routes;
+        }
+
         private KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> BeforeCalculateShortestPath(string startLatLon, string endLatLon)
         {
             PrepareData.PrepareNodesGraph();
 
-            //var startLL = startLatLon.Split(',');
-            //var startNode = nodes.Aggregate((n1, n2) => Utils.Vzdialenost(n1.Value.Lat, double.Parse(startLL[0], CultureInfo.InvariantCulture),
-            //                                                              n1.Value.Lon, double.Parse(startLL[1], CultureInfo.InvariantCulture)) <
-            //                                            Utils.Vzdialenost(n2.Value.Lat, double.Parse(startLL[0], CultureInfo.InvariantCulture),
-            //                                                              n2.Value.Lon, double.Parse(startLL[1], CultureInfo.InvariantCulture))
-            //                                            ? n1 : n2);
-
-            //var endLL = endLatLon.Split(',');
-            //var endNode = nodes.Aggregate((n1, n2) => Utils.Vzdialenost(n1.Value.Lat, double.Parse(endLL[0], CultureInfo.InvariantCulture),
-            //                                                            n1.Value.Lon, double.Parse(endLL[1], CultureInfo.InvariantCulture)) <
-            //                                          Utils.Vzdialenost(n2.Value.Lat, double.Parse(endLL[0], CultureInfo.InvariantCulture),
-            //                                                            n2.Value.Lon, double.Parse(endLL[1], CultureInfo.InvariantCulture))
-            //                                          ? n1 : n2);
             var startLL = startLatLon.Split(',');
-            var startNode = PrepareData.NodesGraph.Aggregate((n1, n2) => Math.Abs(n1.Key.Lat - double.Parse(startLL[0], CultureInfo.InvariantCulture)) +
-                                                                Math.Abs(n1.Key.Lon - double.Parse(startLL[1], CultureInfo.InvariantCulture)) <
-                                                                Math.Abs(n2.Key.Lat - double.Parse(startLL[0], CultureInfo.InvariantCulture)) +
-                                                                Math.Abs(n2.Key.Lon - double.Parse(startLL[1], CultureInfo.InvariantCulture))
-                                                                ? n1 : n2);
+            var startNode = PrepareData.NodesGraph.Aggregate((n1, n2) => Utils.Vzdialenost(n1.Key.Lat, 
+                                                                                           n1.Key.Lon, 
+                                                                                           double.Parse(startLL[0], CultureInfo.InvariantCulture),
+                                                                                           double.Parse(startLL[1], CultureInfo.InvariantCulture)) <
+                                                                         Utils.Vzdialenost(n2.Key.Lat, 
+                                                                                           n2.Key.Lon,
+                                                                                           double.Parse(startLL[0], CultureInfo.InvariantCulture),
+                                                                                           double.Parse(startLL[1], CultureInfo.InvariantCulture))
+                                                             ? n1 : n2);
 
             var endLL = endLatLon.Split(',');
-            var endNode = PrepareData.NodesGraph.Aggregate((n1, n2) => Math.Abs(n1.Key.Lat - double.Parse(endLL[0], CultureInfo.InvariantCulture)) +
-                                                            Math.Abs(n1.Key.Lon - double.Parse(endLL[1], CultureInfo.InvariantCulture)) <
-                                                            Math.Abs(n2.Key.Lat - double.Parse(endLL[0], CultureInfo.InvariantCulture)) +
-                                                            Math.Abs(n2.Key.Lon - double.Parse(endLL[1], CultureInfo.InvariantCulture))
-                                                            ? n1 : n2);
+            var endNode = PrepareData.NodesGraph.Aggregate((n1, n2) => Utils.Vzdialenost(n1.Key.Lat,
+                                                                                         n1.Key.Lon,
+                                                                                         double.Parse(endLL[0], CultureInfo.InvariantCulture),
+                                                                                         double.Parse(endLL[1], CultureInfo.InvariantCulture)) <
+                                                                       Utils.Vzdialenost(n2.Key.Lat,
+                                                                                         n2.Key.Lon,
+                                                                                         double.Parse(endLL[0], CultureInfo.InvariantCulture),
+                                                                                         double.Parse(endLL[1], CultureInfo.InvariantCulture))
+                                                           ? n1 : n2);
 
             return new KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>>(startNode, endNode);
         }
 
+        private KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>> BeforeCalculateDisabledShortestPath(string startLatLon, string endLatLon)
+        {
+            PrepareData.PrepareNodesGraph();
+
+            var startLL = startLatLon.Split(',');
+            var startNode = PrepareData.DisabledMovementGraph.Aggregate((n1, n2) => Utils.Vzdialenost(n1.Key.Lat,
+                                                                                           n1.Key.Lon,
+                                                                                           double.Parse(startLL[0], CultureInfo.InvariantCulture),
+                                                                                           double.Parse(startLL[1], CultureInfo.InvariantCulture)) <
+                                                                         Utils.Vzdialenost(n2.Key.Lat,
+                                                                                           n2.Key.Lon,
+                                                                                           double.Parse(startLL[0], CultureInfo.InvariantCulture),
+                                                                                           double.Parse(startLL[1], CultureInfo.InvariantCulture))
+                                                             ? n1 : n2);
+
+            var endLL = endLatLon.Split(',');
+            var endNode = PrepareData.DisabledMovementGraph.Aggregate((n1, n2) => Utils.Vzdialenost(n1.Key.Lat,
+                                                                                         n1.Key.Lon,
+                                                                                         double.Parse(endLL[0], CultureInfo.InvariantCulture),
+                                                                                         double.Parse(endLL[1], CultureInfo.InvariantCulture)) <
+                                                                       Utils.Vzdialenost(n2.Key.Lat,
+                                                                                         n2.Key.Lon,
+                                                                                         double.Parse(endLL[0], CultureInfo.InvariantCulture),
+                                                                                         double.Parse(endLL[1], CultureInfo.InvariantCulture))
+                                                           ? n1 : n2);
+
+            return new KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>>(startNode, endNode);
+        }
+
         private Routes AfterCalculateShortestPath(NodeGraphDTO nodeCon)
         {
+            if (nodeCon == null)
+                return null;
+
             NodeGraphDTO node = nodeCon;
             LinkedList<NodeLocationDTO> nodeRoute = new LinkedList<NodeLocationDTO>();
             while (node != null)
@@ -155,6 +279,9 @@ namespace RoutingProblem.Controllers
 
         private Routes AfterCalculateShortestPathDuplex(NodeGraphDTO nodeCon)
         {
+            if (nodeCon == null)
+                return null;
+
             NodeGraphDTO node = nodeCon;
             LinkedList<NodeLocationDTO> nodeRoute = new LinkedList<NodeLocationDTO>();
             while (node != null)
@@ -194,6 +321,9 @@ namespace RoutingProblem.Controllers
 
         private Routes AfterCalculateShortestPathMultiLabel(NodeGraphDTO nodeCon)
         {
+            if (nodeCon == null)
+                return null;
+
             Routes routes = new Routes();
 
             foreach (MultiLabelMark n in nodeCon.MultiLabelMark)

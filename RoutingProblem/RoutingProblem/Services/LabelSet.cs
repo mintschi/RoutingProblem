@@ -14,13 +14,14 @@ namespace RoutingProblem.Services
 
             NodeGraphDTO currentNode = null;
             HashSet<NodeGraphDTO> settledNodes = new HashSet<NodeGraphDTO>();
-            Queue<NodeGraphDTO> unsettledNodes = new Queue<NodeGraphDTO>();
+            HashSet<NodeGraphDTO> unsettledNodes = new HashSet<NodeGraphDTO>();
 
-            unsettledNodes.Enqueue(startNode);
+            unsettledNodes.Add(startNode);
 
             while (unsettledNodes.Count() != 0)
             {
-                currentNode = unsettledNodes.Dequeue();
+                currentNode = unsettledNodes.OrderBy(n => n.CurrentDistance).First();
+                unsettledNodes.Remove(currentNode);
                 if (currentNode.Equals(endNode))
                 {
                     return currentNode;
@@ -42,14 +43,14 @@ namespace RoutingProblem.Services
             return null;
         }
 
-        private void CalculateMinimumDistance(NodeGraphDTO evaluationNode, double edgeWeigh, NodeGraphDTO sourceNode, Queue<NodeGraphDTO> unsettledNodes)
+        private void CalculateMinimumDistance(NodeGraphDTO evaluationNode, double edgeWeigh, NodeGraphDTO sourceNode, HashSet<NodeGraphDTO> unsettledNodes)
         {
             double sourceDistance = sourceNode.CurrentDistance;
             if (sourceDistance + edgeWeigh < evaluationNode.CurrentDistance)
             {
                 evaluationNode.CurrentDistance = sourceDistance + edgeWeigh;
                 evaluationNode.PreviousNode = sourceNode;
-                unsettledNodes.Enqueue(evaluationNode);
+                unsettledNodes.Add(evaluationNode);
             }
         }
     }

@@ -8,9 +8,19 @@ import { IRoutes } from './interfaces/IRoutes';
 export class MapHttpService {
     constructor(private _http: Http) { }
 
-    findRoute(type: string, routeType: string, startLatLon: string, endLatLon: string, kRoutes: string): Promise<any> {
+    findRoute(type: string, disabled: string, routeType: string, startLatLon: string, endLatLon: string, kRoutes: string): Promise<any> {
         if (type === "multilabel") {
-            return this._http.get('/api/Route/' + type + '/' + startLatLon + '/' + endLatLon + '/' + kRoutes + '/')
+            if (disabled === "disabled") {
+                return this._http.get('/api/Route/' + type + '/' + disabled + '/' + startLatLon + '/' + endLatLon + '/' + kRoutes + '/')
+                    .map((response: Response) => response.json() as IRoutes)
+                    .toPromise();
+            } else {
+                return this._http.get('/api/Route/' + type + '/' + startLatLon + '/' + endLatLon + '/' + kRoutes + '/')
+                    .map((response: Response) => response.json() as IRoutes)
+                    .toPromise();
+            }
+        } else if (disabled === "disabled") {
+            return this._http.get('/api/Route/' + type + '/' + disabled + '/' + startLatLon + '/' + endLatLon + '/')
                 .map((response: Response) => response.json() as IRoutes)
                 .toPromise();
         } else {

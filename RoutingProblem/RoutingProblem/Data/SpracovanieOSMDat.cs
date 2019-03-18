@@ -21,6 +21,7 @@ namespace RoutingProblem.Data
             var nodesAll = new Dictionary<decimal, Node>();
             var nodesEdge = new Dictionary<decimal, Node>();
             var edges = new List<Edge>();
+            var disabledMovements = new List<DisabledMovement>();
             xml.Load("C:\\Users\\Martin\\Downloads\\BasicOSMParser-master\\BasicOSMParser-master\\OSM_nove.osm");
 
             XmlNodeList documentNodeList = xml.DocumentElement.SelectNodes("/osm/node");
@@ -42,6 +43,7 @@ namespace RoutingProblem.Data
             if (documentWayList.Count > 0)
             {
                 decimal id_edge = 0;
+                decimal id_disabledM = 0;
 
                 foreach (XmlNode row in documentWayList)
                 {
@@ -103,6 +105,19 @@ namespace RoutingProblem.Data
                                     edge1.EndNode = edge.StartNode;
                                     edge1.DistanceInMeters = edge.DistanceInMeters;
                                     edges.Add(edge1);
+
+                                    disabledMovements.Add(new DisabledMovement()
+                                    {
+                                        IdDisabledMovement = id_disabledM++,
+                                        StartEdge = edge.IdEdge,
+                                        EndEdge = edge1.IdEdge
+                                    });
+                                    disabledMovements.Add(new DisabledMovement()
+                                    {
+                                        IdDisabledMovement = id_disabledM++,
+                                        StartEdge = edge1.IdEdge,
+                                        EndEdge = edge.IdEdge
+                                    });
                                 }
 
                                 end_node = edge.StartNode;
@@ -116,11 +131,11 @@ namespace RoutingProblem.Data
                 }
             }
 
-            NaplnenieDatabazy(nodesEdge, edges);
+            NaplnenieDatabazy(nodesEdge, edges, disabledMovements);
             return true;
         }
 
-        private void NaplnenieDatabazy(Dictionary<decimal, Node> nodes, List<Edge> edges)
+        private void NaplnenieDatabazy(Dictionary<decimal, Node> nodes, List<Edge> edges, List<DisabledMovement> disabledMovements)
         {
             var dtNode = new DataTable();
             dtNode.Columns.Add("id_node");
@@ -140,12 +155,21 @@ namespace RoutingProblem.Data
 
             edges.ForEach(n => dtEdge.Rows.Add(n.IdEdge, n.StartNode, n.EndNode, n.DistanceInMeters));
 
+            var dtDisabledM = new DataTable();
+            dtDisabledM.Columns.Add("id_disabled_movement");
+            dtDisabledM.Columns.Add("start_edge");
+            dtDisabledM.Columns.Add("end_edge");
+
+            disabledMovements.ForEach(n => dtDisabledM.Rows.Add(n.IdDisabledMovement, n.StartEdge, n.EndEdge));
+
             using (var sqlBulk = new SqlBulkCopy("Server=mainpc\\sqlexpress;Database=DopravnaSiet;Trusted_Connection=True;"))
             {
                 sqlBulk.DestinationTableName = "Node";
                 sqlBulk.WriteToServer(dtNode);
                 sqlBulk.DestinationTableName = "Edge";
                 sqlBulk.WriteToServer(dtEdge);
+                sqlBulk.DestinationTableName = "DisabledMovement";
+                sqlBulk.WriteToServer(dtDisabledM);
             }
         }
     }

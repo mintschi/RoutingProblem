@@ -27,6 +27,7 @@ export class MapComponent implements OnInit {
     public vector: any;
     public routeLayer: any;
     public type: string = "dijkster";
+    public disabled: string = "";
     public routeType: string = "najkratsia";
     public map: any;
     public startPointFeature: any;
@@ -150,7 +151,7 @@ export class MapComponent implements OnInit {
                 return this.getStyle(feature.get('type'));
             }
         });
-        this.service.findRoute(this.type, this.routeType, this.startLatLon, this.endLatLon, this.kRoutes)
+        this.service.findRoute(this.type, this.disabled, this.routeType, this.startLatLon, this.endLatLon, this.kRoutes)
             .then((route: IRoutes) => {
                 this.route = route.route[this.idRoute];
                 this.points = this.route.nodes;
@@ -198,6 +199,11 @@ export class MapComponent implements OnInit {
         if (this.interactiveRoute == true) {
             this.modifyend();
         }
+    }
+
+    disabledM(evt: any) {
+        this.disabled = evt.target.checked ? 'disabled' : '';
+        this.modifyend();
     }
 
     changeStartEnd() {

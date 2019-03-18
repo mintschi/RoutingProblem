@@ -10,8 +10,15 @@ namespace RoutingProblem.Services
     public class PrepareData
     {
         public static Dictionary<Node, NodeGraphDTO> NodesGraph { get; set; }
+        public static Dictionary<Node, NodeDisabledMovementDTO> DisabledMovementGraph { get; set; }
+        private static Dictionary<Node, List<KeyValuePair<NodeDisabledMovementDTO, double>>> NodesTempEnd 
+            = new Dictionary<Node, List<KeyValuePair<NodeDisabledMovementDTO, double>>>();
+        private static Dictionary<Node, List<NodeDisabledMovementDTO>> NodesTempStart
+            = new Dictionary<Node, List<NodeDisabledMovementDTO>>();
+        private static Dictionary<Node, List<DisabledMovement>> disabledMovement
+            = new Dictionary<Node, List<DisabledMovement>>();
 
-        public static void PrepareNodesGraph(DbSet<Node> nodes)
+        public static void PrepareNodesGraph(DbSet<Node> nodes, DbSet<DisabledMovement> disabledMovements)
         {
             NodesGraph = (from n in nodes
                           select new NodeGraphDTO()
@@ -24,6 +31,19 @@ namespace RoutingProblem.Services
                               EdgeNavigation = n.EdgeStartNodeNavigation,
                               EdgeNavigationR = n.EdgeEndNodeNavigation
                           }).ToDictionary(n => n.Node);
+
+            DisabledMovementGraph = (from n in nodes
+                                    select new NodeDisabledMovementDTO()
+                                    {
+                                        NodeFirst = n,
+                                        Node = n,
+                                        PreviousNode = null,
+                                        CurrentDistance = Double.MaxValue,
+                                        EstimateDistanceToEnd = Double.MaxValue,
+                                        FScore = Double.MaxValue,
+                                        EdgeNavigation = n.EdgeStartNodeNavigation,
+                                        EdgeNavigationR = n.EdgeEndNodeNavigation
+                                    }).ToDictionary(n => n.Node);
 
             foreach (var n in NodesGraph)
             {
@@ -43,21 +63,165 @@ namespace RoutingProblem.Services
                     }
                 }
             }
+
+            foreach (var n in DisabledMovementGraph)
+            {
+                foreach (Edge e in n.Value.EdgeNavigation)
+                {
+                    if (!n.Value.NeighborNodeNavigation.Keys.Contains(DisabledMovementGraph[e.EndNodeNavigation]))
+                    {
+                        NodeDisabledMovementDTO ndm = new NodeDisabledMovementDTO()
+                        {
+                            NodeFirst = n.Key,
+                            Node = e.EndNodeNavigation,
+                            PreviousNode = null,
+                            CurrentDistance = Double.MaxValue,
+                            EstimateDistanceToEnd = Double.MaxValue,
+                            FScore = Double.MaxValue
+                        };
+
+                        if (!NodesTempEnd.Keys.Contains(e.EndNodeNavigation))
+                        {
+                            NodesTempEnd.Add(e.EndNodeNavigation, new List<KeyValuePair<NodeDisabledMovementDTO, double>>());
+                        }
+                        NodesTempEnd[e.EndNodeNavigation].Add(new KeyValuePair<NodeDisabledMovementDTO, double>(ndm, e.DistanceInMeters));
+
+                        if (!NodesTempStart.Keys.Contains(n.Key))
+                        {
+                            NodesTempStart.Add(n.Key, new List<NodeDisabledMovementDTO>());
+                        }
+                        NodesTempStart[n.Key].Add(ndm);
+                    }
+                }
+            }
+
+            PrepareDisabledMovement(disabledMovements);
+            PrepareDisabledMovementGraph();
+        }
+
+        private static void PrepareDisabledMovement(DbSet<DisabledMovement> disabledMovements)
+        {
+            foreach (var d in disabledMovements)
+            {
+                if (!disabledMovement.Keys.Contains(d.StartEdgeNavigation.EndNodeNavigation))
+                {
+                    disabledMovement.Add(d.StartEdgeNavigation.EndNodeNavigation, new List<DisabledMovement>());
+                }
+                disabledMovement[d.StartEdgeNavigation.EndNodeNavigation].Add(d);
+            }
+        }
+
+        public static void PrepareDisabledMovementGraph()
+        {
+            foreach (var n in DisabledMovementGraph)
+            {
+                if (NodesTempEnd.Keys.Contains(n.Key))
+                {
+                    foreach (KeyValuePair<NodeDisabledMovementDTO, double> ndmEnd in NodesTempEnd[n.Key])
+                    {
+                        if (NodesTempStart.Keys.Contains(n.Key))
+                        {
+                            foreach (NodeDisabledMovementDTO ndmStart in NodesTempStart[n.Key])
+                            {
+                                bool disMov = false;
+                                if (disabledMovement.Keys.Contains(n.Key))
+                                {
+                                    foreach (DisabledMovement dm in disabledMovement[n.Key])
+                                    {
+                                        if (ndmEnd.Key.NodeFirst.Equals(dm.StartEdgeNavigation.StartNodeNavigation)
+                                            && ndmStart.Node.Equals(dm.EndEdgeNavigation.EndNodeNavigation))
+                                        {
+                                            disMov = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!disMov && !ndmEnd.Key.NeighborNodeNavigation.Keys.Contains(ndmStart))
+                                {
+                                    ndmEnd.Key.NeighborNodeNavigation.Add(ndmStart, ndmEnd.Value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void PutStartEnd(Node nodeStart, Node nodeEnd)
+        {
+            if (DisabledMovementGraph.Keys.Contains(nodeStart))
+            {
+                foreach (NodeDisabledMovementDTO ndmStart in NodesTempStart[nodeStart])
+                {
+                    DisabledMovementGraph[nodeStart].NeighborNodeNavigation.Add(ndmStart, 0);
+                }
+            }
+
+            if (DisabledMovementGraph.Keys.Contains(nodeEnd))
+            {
+                foreach (KeyValuePair<NodeDisabledMovementDTO, double> ndmEnd in NodesTempEnd[nodeEnd])
+                {
+                    ndmEnd.Key.NeighborNodeNavigation.Add(DisabledMovementGraph[nodeEnd], ndmEnd.Value);
+                }
+            }
+        }
+
+        public static void RemoveStartEnd(Node nodeStart, Node nodeEnd)
+        {
+            foreach (NodeDisabledMovementDTO ndmStart in NodesTempStart[nodeStart])
+            {
+                DisabledMovementGraph[nodeStart].NeighborNodeNavigation.Remove(ndmStart);
+            }
+
+            foreach (KeyValuePair<NodeDisabledMovementDTO, double> ndmEnd in NodesTempEnd[nodeEnd])
+            {
+                ndmEnd.Key.NeighborNodeNavigation.Remove(DisabledMovementGraph[nodeEnd]);
+            }
         }
 
         public static void PrepareNodesGraph()
         {
             foreach (var n in NodesGraph)
             {
-                n.Value.PreviousNode = null;
-                n.Value.CurrentDistance = Double.MaxValue;
-                n.Value.EstimateDistanceToEnd = Double.MaxValue;
-                n.Value.FScore = Double.MaxValue;
-                n.Value.PreviousNodeR = null;
-                n.Value.CurrentDistanceR = Double.MaxValue;
-                n.Value.MultiLabelMark.Clear();
+                PrepareNode(n.Value);
+            }
+
+            foreach (var n in DisabledMovementGraph)
+            {
+                PrepareNode(n.Value);
+            }
+
+            foreach (var nd in NodesTempStart)
+            {
+                foreach (var n in nd.Value)
+                {
+                    PrepareNode(n);
+                }
             }
             Utils.PocetNavstivenychHran = 0;
+        }
+
+        private static void PrepareNode(NodeGraphDTO n)
+        {
+            n.PreviousNode = null;
+            n.CurrentDistance = Double.MaxValue;
+            n.EstimateDistanceToEnd = Double.MaxValue;
+            n.FScore = Double.MaxValue;
+            n.PreviousNodeR = null;
+            n.CurrentDistanceR = Double.MaxValue;
+            n.MultiLabelMark.Clear();
+        }
+
+        private static void PrepareNode(NodeDisabledMovementDTO n)
+        {
+            n.PreviousNode = null;
+            n.CurrentDistance = Double.MaxValue;
+            n.EstimateDistanceToEnd = Double.MaxValue;
+            n.FScore = Double.MaxValue;
+            n.PreviousNodeR = null;
+            n.CurrentDistanceR = Double.MaxValue;
+            n.MultiLabelMark.Clear();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace RoutingProblem.Controllers
             DopravnaSietContext dopravnaSietContext = new DopravnaSietContext();
             //SpracovanieOSMDat spracovanieOSMDat = new SpracovanieOSMDat();
             //spracovanieOSMDat.SpracovanieXMLDat(dopravnaSietContext);
-            PrepareData.PrepareNodesGraph(dopravnaSietContext.Node);
+            PrepareData.PrepareNodesGraph(dopravnaSietContext.Node, dopravnaSietContext.DisabledMovement);
             return View();
         }
 

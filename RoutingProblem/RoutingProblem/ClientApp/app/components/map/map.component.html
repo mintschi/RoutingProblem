@@ -52,30 +52,36 @@
 
     <div class="form-option">
         <label id="lblOptions">Možnosti</label><br />
-        <div class="option">
-            <label>Algoritmus:</label><br />
-            <div class="row">
-                <div class="column">
-                    <input type="radio" name="type" value="dijkster" [checked]="type === 'dijkster'" (click)="type = 'dijkster';modifyend();"> Dijkstra<br />
-                    <input type="radio" name="type" value="labelcorrect" [checked]="type === 'labelcorrect'" (click)="type = 'labelcorrect';modifyend();"> Label Correct<br />
-                    <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset';modifyend();"> Label Set<br />
-                    <label id="pocet-tras" *ngIf="type === 'multilabel'">Počet trás:</label>
-                </div>
-                <div class="column">
-                    <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster';modifyend();"> Duplex dijkstra<br />
-                    <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar';modifyend();"> A-Star<br />
-                    <input type="radio" name="type" value="multilabel" [checked]="type === 'multilabel'" (click)="type = 'multilabel'"> Multi Label<br />
-                    <input id="k" type="text" *ngIf="type === 'multilabel'" (blur)="modifyend()" required>
-                    <!--<input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
-                    <input type="radio" name="routeType" value="najrychlejsia" [checked]="routeType === 'najrychlejsia'" (click)="routeType = 'najrychlejsia'"> najrýchlejšia<br>
-                    <input type="radio" name="routeType" value="najjednoduchsia" [checked]="routeType === 'najjednoduchsia'" (click)="routeType = 'najjednoduchsia'"> najjednoduchšia-->
-                </div>
-            </div>
-            <label>Interaktívne hľadanie trasy:</label><br />
-            <div class="column">
-                <label class="interactive"><input type="checkbox" (change)="interactive($event)" [checked]="interactiveRoute === true"> Automaticky vyhľadať</label><br />
-            </div>
-        </div>
+                                               <div class="option">
+                                                   <label>Algoritmus:</label><br />
+                                                   <div class="row">
+                                                       <div class="column">
+                                                           <input type="radio" name="type" value="zakladny" [checked]="type === 'zakladny'" (click)="type = 'zakladny';modifyend();"> Základný<br />
+                                                           <input type="radio" name="type" value="labelcorrect" [checked]="type === 'labelcorrect'" (click)="type = 'labelcorrect';modifyend();"> Label Correct<br />
+                                                           <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar';modifyend();"> A-Star<br />
+                                                           <input type="radio" name="type" value="multilabel" [checked]="type === 'multilabel'" (click)="type = 'multilabel'"> Multi Label<br />
+                                                           <label id="pocet-tras" *ngIf="type === 'multilabel'">Počet trás:</label>
+                                                       </div>
+                                                       <div class="column">
+                                                           <input type="radio" name="type" value="dijkster" [checked]="type === 'dijkster'" (click)="type = 'dijkster';modifyend();"> Dijkstra<br />
+                                                           <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset';modifyend();"> Label Set<br />
+                                                           <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster';modifyend();"> Duplex dijkstra<br />
+                                                           <label> </label><br />
+                                                           <input id="k" type="text" *ngIf="type === 'multilabel'" (blur)="modifyend()" required>
+                                                           <!--<input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
+            <input type="radio" name="routeType" value="najrychlejsia" [checked]="routeType === 'najrychlejsia'" (click)="routeType = 'najrychlejsia'"> najrýchlejšia<br>
+            <input type="radio" name="routeType" value="najjednoduchsia" [checked]="routeType === 'najjednoduchsia'" (click)="routeType = 'najjednoduchsia'"> najjednoduchšia-->
+                                                       </div>
+                                                   </div>
+                                                   <label>Zakázané manévre:</label><br />
+                                                   <div class="">
+                                                       <label class="interactive"><input type="checkbox" (change)="disabledM($event)" [checked]="disabled === 'disabled'"> Vyhľadať so zakázanými manévrami</label><br />
+                                                   </div>
+                                                   <label>Interaktívne hľadanie trasy:</label><br />
+                                                   <div class="column">
+                                                       <label class="interactive"><input type="checkbox" (change)="interactive($event)" [checked]="interactiveRoute === true"> Automaticky vyhľadať</label><br />
+                                                   </div>
+                                               </div>
     </div>
     <!--<div class="div-find">-->
         <button id="btnFindRoute" type="button" (click)="findRoute()" class="btn" [disabled]="disableFind" *ngIf="interactiveRoute === false">Find</button>
