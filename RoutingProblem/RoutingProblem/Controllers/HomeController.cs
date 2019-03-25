@@ -14,10 +14,22 @@ namespace RoutingProblem.Controllers
     {
         public IActionResult Index()
         {
-            DopravnaSietContext dopravnaSietContext = new DopravnaSietContext();
+            //DopravnaSietContext dopravnaSietContext = new DopravnaSietContext();
+            //dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault().Active = false;
+            //dopravnaSietContext.SaveChanges();
             //SpracovanieOSMDat spracovanieOSMDat = new SpracovanieOSMDat();
-            //spracovanieOSMDat.SpracovanieXMLDat(dopravnaSietContext);
-            PrepareData.PrepareNodesGraph(dopravnaSietContext.Node, dopravnaSietContext.DisabledMovement);
+            //spracovanieOSMDat.SpracovanieXMLDat(dopravnaSietContext, new Models.Data()
+            //{
+            //    IdData = 2,
+            //    Title = "Žilina zakázané manévre",
+            //    MinLat = 49.1094,
+            //    MinLon = 18.5738,
+            //    MaxLat = 49.2826,
+            //    MaxLon = 19.0112,
+            //    Active = true
+            //});
+            //Models.Data data = dopravnaSietContext.Data.Where(d => d.Active == true).First();
+            //PrepareData.PrepareNodesGraph(dopravnaSietContext.Node.Where(d => d.IdData == data.IdData), dopravnaSietContext.DisabledMovement.Where(d => d.IdData == data.IdData));
             return View();
         }
 

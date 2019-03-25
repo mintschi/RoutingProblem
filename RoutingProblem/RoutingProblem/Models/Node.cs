@@ -12,9 +12,11 @@ namespace RoutingProblem.Models
         }
 
         public decimal IdNode { get; set; }
+        public decimal IdData { get; set; }
         public double Lat { get; set; }
         public double Lon { get; set; }
 
+        public virtual Data IdDataNavigation { get; set; }
         public virtual ICollection<Edge> EdgeEndNodeNavigation { get; set; }
         public virtual ICollection<Edge> EdgeStartNodeNavigation { get; set; }
     }

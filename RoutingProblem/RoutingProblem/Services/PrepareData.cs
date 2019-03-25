@@ -10,6 +10,8 @@ namespace RoutingProblem.Services
     public class PrepareData
     {
         public static Dictionary<Node, NodeGraphDTO> NodesGraph { get; set; }
+        public static LinkedList<NodeDisabledMovementDTO> NodesDisabledAll { get; set; }
+            = new LinkedList<NodeDisabledMovementDTO>();
         public static Dictionary<Node, NodeDisabledMovementDTO> DisabledMovementGraph { get; set; }
         private static Dictionary<Node, List<KeyValuePair<NodeDisabledMovementDTO, double>>> NodesTempEnd 
             = new Dictionary<Node, List<KeyValuePair<NodeDisabledMovementDTO, double>>>();
@@ -18,7 +20,7 @@ namespace RoutingProblem.Services
         private static Dictionary<Node, List<DisabledMovement>> disabledMovement
             = new Dictionary<Node, List<DisabledMovement>>();
 
-        public static void PrepareNodesGraph(DbSet<Node> nodes, DbSet<DisabledMovement> disabledMovements)
+        public static void PrepareNodesGraph(IQueryable<Node> nodes, IQueryable<DisabledMovement> disabledMovements)
         {
             NodesGraph = (from n in nodes
                           select new NodeGraphDTO()
@@ -66,6 +68,8 @@ namespace RoutingProblem.Services
 
             foreach (var n in DisabledMovementGraph)
             {
+                NodesDisabledAll.AddLast(n.Value);
+
                 foreach (Edge e in n.Value.EdgeNavigation)
                 {
                     if (!n.Value.NeighborNodeNavigation.Keys.Contains(DisabledMovementGraph[e.EndNodeNavigation]))
@@ -79,6 +83,7 @@ namespace RoutingProblem.Services
                             EstimateDistanceToEnd = Double.MaxValue,
                             FScore = Double.MaxValue
                         };
+                        NodesDisabledAll.AddLast(ndm);
 
                         if (!NodesTempEnd.Keys.Contains(e.EndNodeNavigation))
                         {
@@ -99,7 +104,7 @@ namespace RoutingProblem.Services
             PrepareDisabledMovementGraph();
         }
 
-        private static void PrepareDisabledMovement(DbSet<DisabledMovement> disabledMovements)
+        private static void PrepareDisabledMovement(IQueryable<DisabledMovement> disabledMovements)
         {
             foreach (var d in disabledMovements)
             {

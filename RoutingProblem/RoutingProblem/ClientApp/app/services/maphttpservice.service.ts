@@ -3,6 +3,7 @@ import { Http, HttpModule, Response } from '@angular/http';
 import { IRoute } from './interfaces/IRoute';
 import 'rxjs/add/operator/toPromise';
 import { IRoutes } from './interfaces/IRoutes';
+import { IField } from './interfaces/IField';
 
 @Injectable()
 export class MapHttpService {
@@ -28,5 +29,23 @@ export class MapHttpService {
                 .map((response: Response) => response.json() as IRoutes)
                 .toPromise();
         }
+    }
+
+    downloadData(title: string, minLat: string, minLon: string, maxLat: string, maxLon: string): Promise<any> {
+        return this._http.get('/api/Route/data/' + title + '/' + minLat + '/' + minLon + '/' + maxLat + '/' + maxLon)
+            .map((response: Response) => response.json() as boolean)
+            .toPromise();
+    }
+
+    setData(id: string): Promise<any> {
+        return this._http.post('/api/Route/data/' + id, null)
+            .map((response: Response) => response.json() as boolean)
+            .toPromise();
+    }
+
+    loadFields(): Promise<any> {
+        return this._http.get('/api/Route/fields')
+            .map((response: Response) => response.json() as Array<IField>)
+            .toPromise();
     }
 }

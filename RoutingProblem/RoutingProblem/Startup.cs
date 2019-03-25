@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RoutingProblem.Models;
+using RoutingProblem.Services;
 
 namespace RoutingProblem
 {
@@ -56,6 +57,17 @@ namespace RoutingProblem
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });
             });
+
+            DopravnaSietContext dopravnaSietContext = new DopravnaSietContext();
+            Models.Data data = dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault();
+            if (data == null)
+            {
+                PrepareData.PrepareNodesGraph(dopravnaSietContext.Node, dopravnaSietContext.DisabledMovement);
+            }
+            else
+            {
+                PrepareData.PrepareNodesGraph(dopravnaSietContext.Node.Where(d => d.IdData == data.IdData), dopravnaSietContext.DisabledMovement.Where(d => d.IdData == data.IdData));
+            }
         }
     }
 }

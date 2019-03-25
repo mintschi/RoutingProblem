@@ -8,7 +8,7 @@ namespace RoutingProblem.Services
 {
     public class Utils
     {
-        private const double POLOMER_ZEMEGULE_METRE = 6369628.75;
+        private const double RADIUS_EARTH_IN_METERS = 6369628.75;
         public static Int32 PocetNavstivenychHran { get; set; }
 
         public static double Vzdialenost(double startLat, double startLon, double endLat, double endLon)
@@ -19,10 +19,10 @@ namespace RoutingProblem.Services
                     + Math.Cos(ConvertDegreesToRadians(startLat)) * Math.Cos(ConvertDegreesToRadians(endLat))
                     * Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
             double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            return (POLOMER_ZEMEGULE_METRE * c);
+            return (RADIUS_EARTH_IN_METERS * c);
         }
 
-        public static double Vzdialenost(Node startNode, Node endNode)
+        public static double Distance(Node startNode, Node endNode)
         {
             double dLat = ConvertDegreesToRadians(endNode.Lat - startNode.Lat);
             double dLng = ConvertDegreesToRadians(endNode.Lon - startNode.Lon);
@@ -30,7 +30,7 @@ namespace RoutingProblem.Services
                     + Math.Cos(ConvertDegreesToRadians(startNode.Lat)) * Math.Cos(ConvertDegreesToRadians(endNode.Lat))
                     * Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
             double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            return (POLOMER_ZEMEGULE_METRE * c);
+            return (RADIUS_EARTH_IN_METERS * c);
         }
 
         private static double ConvertDegreesToRadians(double degrees)

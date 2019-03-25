@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <None Remove="ClientApp\app\services\interfaces\IData.ts" />
+    <None Remove="ClientApp\app\services\interfaces\IField.ts" />
     <None Remove="ClientApp\app\services\interfaces\IRoute.ts" />
     <None Remove="ClientApp\app\services\interfaces\IRoutes.ts" />
     <None Remove="ClientApp\app\services\maphttpservice.service.ts" />
@@ -37,6 +38,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\app\services\interfaces\IData.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\interfaces\IField.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\interfaces\IRoute.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\interfaces\IRoutes.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\maphttpservice.service.ts" />

@@ -11,7 +11,7 @@ namespace RoutingProblem.Services
         public NodeGraphDTO CalculateShortestPath(NodeGraphDTO startNode, NodeGraphDTO endNode)
         {
             startNode.CurrentDistance = 0;
-            startNode.EstimateDistanceToEnd = Utils.Vzdialenost(startNode.Node, endNode.Node);
+            startNode.EstimateDistanceToEnd = Utils.Distance(startNode.Node, endNode.Node);
             startNode.FScore = startNode.EstimateDistanceToEnd;
 
             NodeGraphDTO currentNode = null;
@@ -63,11 +63,11 @@ namespace RoutingProblem.Services
 
         private void CalculateMinimumDistance(NodeGraphDTO evaluationNode, double edgeWeigh, NodeGraphDTO sourceNode, NodeGraphDTO endNode)
         {
-            double sourceDistance = sourceNode.CurrentDistance;
-            if (sourceDistance + edgeWeigh < evaluationNode.CurrentDistance)
+            double sourceDistance = sourceNode.FScore;
+            if (sourceDistance + edgeWeigh < evaluationNode.FScore)
             {
-                evaluationNode.CurrentDistance = sourceDistance + edgeWeigh;
-                evaluationNode.EstimateDistanceToEnd = Utils.Vzdialenost(evaluationNode.Node, endNode.Node);
+                evaluationNode.CurrentDistance = sourceNode.CurrentDistance + edgeWeigh;
+                evaluationNode.EstimateDistanceToEnd = Utils.Distance(evaluationNode.Node, endNode.Node);
                 evaluationNode.FScore = evaluationNode.CurrentDistance + evaluationNode.EstimateDistanceToEnd;
                 evaluationNode.PreviousNode = sourceNode;
             }

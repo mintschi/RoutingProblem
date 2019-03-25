@@ -104,6 +104,20 @@ namespace RoutingProblem.Controllers
         }
 
         [HttpGet]
+        [Route("zakladny/disabled/{startLatLon}/{endLatLon}")]
+        public Routes ZakladnyDisabled(string startLatLon, string endLatLon)
+        {
+            KeyValuePair<KeyValuePair<Node, NodeDisabledMovementDTO>, KeyValuePair<Node, NodeDisabledMovementDTO>> nodes = BeforeCalculateDisabledShortestPath(startLatLon, endLatLon);
+            PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
+            DateTime start = DateTime.Now;
+            NodeGraphDTO node = zakladny.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value, PrepareData.NodesDisabledAll);
+            timeItTook = DateTime.Now - start;
+            Routes routes = AfterCalculateShortestPath(node);
+            PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
+            return routes;
+        }
+
+        [HttpGet]
         [Route("dijkster/disabled/{startLatLon}/{endLatLon}")]
         public Routes DijksterDisabled(string startLatLon, string endLatLon)
         {
@@ -186,6 +200,59 @@ namespace RoutingProblem.Controllers
             Routes routes = AfterCalculateShortestPathMultiLabel(node);
             PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
             return routes;
+        }
+
+        [HttpGet]
+        [Route("data/{title}/{minLat}/{minLon}/{maxLat}/{maxLon}")]
+        public bool DownloadData(string title, float minLat, float minLon, float maxLat, float maxLon)
+        {
+            decimal id = dopravnaSietContext.Data.Max(d => d.IdData);
+            dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault().Active = false;
+            dopravnaSietContext.SaveChanges();
+            SpracovanieOSMDat spracovanieOSMDat = new SpracovanieOSMDat();
+            spracovanieOSMDat.SpracovanieXMLDat(dopravnaSietContext, new Models.Data() {
+                IdData = ++id,
+                Title = title,
+                MinLat = minLat,
+                MinLon = minLon,
+                MaxLat = maxLat,
+                MaxLon = maxLon,
+                Active = true
+            });
+            Models.Data data = dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault();
+            PrepareData.PrepareNodesGraph(dopravnaSietContext.Node.Where(d => d.IdData == data.IdData), dopravnaSietContext.DisabledMovement.Where(d => d.IdData == data.IdData));
+            return true;
+        }
+
+        [HttpPost]
+        [Route("data/{id}")]
+        public bool SetData(string id)
+        {
+            dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault().Active = false;
+            dopravnaSietContext.Data.Where(d => d.IdData == Convert.ToDecimal(id)).FirstOrDefault().Active = true;
+            dopravnaSietContext.SaveChanges();
+            Models.Data data = dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault();
+            PrepareData.PrepareNodesGraph(dopravnaSietContext.Node.Where(d => d.IdData == data.IdData), dopravnaSietContext.DisabledMovement.Where(d => d.IdData == data.IdData));
+            return true;
+        }
+
+        [HttpGet]
+        [Route("fields")]
+        public LinkedList<KeyValuePair<decimal, string>> LoadFields()
+        {
+            LinkedList<KeyValuePair<decimal, string>> array = new LinkedList<KeyValuePair<decimal, string>>();
+            foreach (Models.Data data in dopravnaSietContext.Data)
+            {
+                if (data.Active)
+                {
+                    array.AddFirst(new KeyValuePair<decimal, string> (data.IdData, data.Title));
+                } else
+                {
+                    array.AddLast(new KeyValuePair<decimal, string>(data.IdData, data.Title));
+                }
+                
+            }
+            return array;
         }
 
         private KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> BeforeCalculateShortestPath(string startLatLon, string endLatLon)

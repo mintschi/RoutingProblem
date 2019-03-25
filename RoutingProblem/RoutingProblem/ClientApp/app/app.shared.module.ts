@@ -8,7 +8,6 @@ import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { MapComponent } from './components/map/map.component';
 import { HomeComponent } from './components/home/home.component';
-import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 
 @NgModule({
@@ -16,7 +15,6 @@ import { CounterComponent } from './components/counter/counter.component';
         AppComponent,
         NavMenuComponent,
         CounterComponent,
-        FetchDataComponent,
         HomeComponent,
         MapComponent
     ],
@@ -29,7 +27,6 @@ import { CounterComponent } from './components/counter/counter.component';
             { path: 'map', component: MapComponent },
             { path: 'home', component: HomeComponent },
             { path: 'counter', component: CounterComponent },
-            { path: 'fetch-data', component: FetchDataComponent },
             { path: '**', redirectTo: 'map' }
         ])
     ]

@@ -1,4 +1,7 @@
 ﻿<div id="map" class="map"></div>
+<div id="loading" *ngIf="load">
+    <img id="loading-gif" src="loading-gif.gif" alt="Načítavanie...">
+</div>
 <!--<label class="open-button" *ngIf="!show" (click)="openForm()"></label>-->
 <button type="button" (click)="openForm()" class="name labelRoute open-button" *ngIf="!show">
     <label>Problémy trasovania v rozsiahlych sietach</label>
@@ -81,7 +84,14 @@
                                                    <div class="column">
                                                        <label class="interactive"><input type="checkbox" (change)="interactive($event)" [checked]="interactiveRoute === true"> Automaticky vyhľadať</label><br />
                                                    </div>
+                                                   <label>Oblasť:</label><br />
+                                                   <div class="column">
+                                                       <select class="interactive" (change)="setData($event.target.value)" id="select">
+                                                           <option [selected]="selectedField == field.key" value="{{field.key}}" *ngFor="let field of fields">{{field.value}}</option>
+                                                       </select><br />
+                                                   </div>
                                                </div>
+
     </div>
     <!--<div class="div-find">-->
         <button id="btnFindRoute" type="button" (click)="findRoute()" class="btn" [disabled]="disableFind" *ngIf="interactiveRoute === false">Find</button>

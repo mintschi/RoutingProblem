@@ -9,6 +9,7 @@ import 'rxjs/add/operator/catch';
 import { style } from '@angular/animations';
 import { IRoutes } from '../../services/interfaces/IRoutes';
 import { IData } from '../../services/interfaces/IData';
+import { IField } from '../../services/interfaces/IField';
 
 declare var ol: any;
 
@@ -34,6 +35,8 @@ export class MapComponent implements OnInit {
     public endPointFeature: any;
     public interactiveRoute: boolean = true;
     public kRoutes: string = "";
+    public idData: string = "5";
+    public load: boolean = false;
     private source: any;
 
     constructor(private service: MapHttpService) { }
@@ -44,7 +47,7 @@ export class MapComponent implements OnInit {
         var name: number = 0;
 
         var raster = new ol.layer.Tile({
-            source: new ol.source.OSM()
+            source: new ol.source.OSM(),
         });
 
         var source = new ol.source.Vector({ wrapX: false });
@@ -126,6 +129,8 @@ export class MapComponent implements OnInit {
         modify.on("modifyend", (evt: any) => {
             this.modifyend();
         });
+
+        this.loadFields();
     }
 
     public points: Array<any> = [];
@@ -231,6 +236,30 @@ export class MapComponent implements OnInit {
             this.idRoute++;
             this.findRoute();
         } 
+    }
+
+    downloadData() {
+        //this.service.downloadData(this.title, );
+    }
+
+    setData(evt: any) {
+        this.load = true;
+        this.service.setData(evt)
+            .then((response: boolean) => {
+                if (response) {
+                    this.selectedField = evt;
+                    this.load = false;
+                }
+            });
+    }
+
+    public fields: Array<IField> = [];
+    public selectedField: any;
+    loadFields() {
+        this.service.loadFields()
+            .then((response: Array<IField>) => {
+                this.fields = response;
+            });
     }
 
     openForm() {
