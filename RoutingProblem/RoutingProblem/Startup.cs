@@ -26,7 +26,7 @@ namespace RoutingProblem
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddDbContext<DopravnaSietContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DopravnaSiet")));
+            services.AddDbContext<GraphContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DopravnaSiet")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,7 +58,7 @@ namespace RoutingProblem
                     defaults: new { controller = "Home", action = "Index" });
             });
 
-            DopravnaSietContext dopravnaSietContext = new DopravnaSietContext();
+            GraphContext dopravnaSietContext = new GraphContext();
             Models.Data data = dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault();
             if (data == null)
             {

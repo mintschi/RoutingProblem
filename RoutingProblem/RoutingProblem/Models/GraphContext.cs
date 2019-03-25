@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace RoutingProblem.Models
 {
-    public partial class DopravnaSietContext : DbContext
+    public partial class GraphContext : DbContext
     {
-        public DopravnaSietContext()
+        public GraphContext()
         {
         }
 
-        public DopravnaSietContext(DbContextOptions<DopravnaSietContext> options)
+        public GraphContext(DbContextOptions<GraphContext> options)
             : base(options)
         {
         }

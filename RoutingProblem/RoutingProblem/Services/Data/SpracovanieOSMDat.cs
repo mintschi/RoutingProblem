@@ -15,7 +15,7 @@ namespace RoutingProblem.Data
     public class SpracovanieOSMDat
     {
         
-        public bool SpracovanieXMLDat(DopravnaSietContext db, Models.Data data)
+        public bool SpracovanieXMLDat(GraphContext db, Models.Data data)
         {
             var xmlReader = new XmlDocument();
             var nodesAll = new Dictionary<decimal, Node>();

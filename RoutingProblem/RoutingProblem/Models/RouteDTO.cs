@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace RoutingProblem.Models
 {
-    public class Route
+    public class RouteDTO
     {
-        public Route () {
+        public RouteDTO () {
             Nodes = new LinkedList<NodeLocationDTO>();
         }
 

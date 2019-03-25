@@ -11,7 +11,7 @@ namespace RoutingProblem.Services
         private const double RADIUS_EARTH_IN_METERS = 6369628.75;
         public static Int32 PocetNavstivenychHran { get; set; }
 
-        public static double Vzdialenost(double startLat, double startLon, double endLat, double endLon)
+        public static double Distance(double startLat, double startLon, double endLat, double endLon)
         {
             double dLat = ConvertDegreesToRadians(endLat - startLat);
             double dLng = ConvertDegreesToRadians(endLon - startLon);

@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace RoutingProblem.Models
 {
-    public class Routes
+    public class RoutesDTO
     {
-        public Routes()
+        public RoutesDTO()
         {
-            Route = new LinkedList<Route>();
+            Route = new LinkedList<RouteDTO>();
         }
 
-        public LinkedList<Route> Route { get; set; }
+        public LinkedList<RouteDTO> Route { get; set; }
     }
 }
