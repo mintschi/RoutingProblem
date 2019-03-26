@@ -3,13 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { Event } from '@angular/router';
 import { forEach } from '@angular/router/src/utils/collection';
 import { Observable } from 'rxjs/Observable';
-import { IRoute } from '../../services/interfaces/IRoute';
+import { IRoute } from '../../models/IRoute';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import { style } from '@angular/animations';
-import { IRoutes } from '../../services/interfaces/IRoutes';
-import { IData } from '../../services/interfaces/IData';
-import { IField } from '../../services/interfaces/IField';
+import { IRoutes } from '../../models/IRoutes';
+import { IData } from '../../models/IData';
+import { IField } from '../../models/IField';
 
 declare var ol: any;
 

@@ -1,9 +1,9 @@
 ﻿import { Injectable } from '@angular/core';
 import { Http, HttpModule, Response } from '@angular/http';
-import { IRoute } from './interfaces/IRoute';
+import { IRoute } from '../models/IRoute';
 import 'rxjs/add/operator/toPromise';
-import { IRoutes } from './interfaces/IRoutes';
-import { IField } from './interfaces/IField';
+import { IRoutes } from '../models/IRoutes';
+import { IField } from '../models/IField';
 
 @Injectable()
 export class MapHttpService {

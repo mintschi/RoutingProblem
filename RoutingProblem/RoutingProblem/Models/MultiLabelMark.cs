@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RoutingProblem.Data
+namespace RoutingProblem.Models
 {
     public class MultiLabelMark
     {

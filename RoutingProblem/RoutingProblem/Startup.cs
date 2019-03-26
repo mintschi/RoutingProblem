@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RoutingProblem.Models;
-using RoutingProblem.Services;
+using RoutingProblem.Services.Data;
 
 namespace RoutingProblem
 {

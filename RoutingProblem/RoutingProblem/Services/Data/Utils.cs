@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RoutingProblem.Services
+namespace RoutingProblem.Services.Data
 {
     public class Utils
     {

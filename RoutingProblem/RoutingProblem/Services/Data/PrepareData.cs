@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RoutingProblem.Services
+namespace RoutingProblem.Services.Data
 {
     public class PrepareData
     {
@@ -66,6 +66,24 @@ namespace RoutingProblem.Services
                 }
             }
 
+            PrepareDisabledMovement(disabledMovements);
+            PrepareDisabledMovementGraph();
+        }
+
+        private static void PrepareDisabledMovement(IQueryable<DisabledMovement> disabledMovements)
+        {
+            foreach (var d in disabledMovements)
+            {
+                if (!disabledMovement.Keys.Contains(d.StartEdgeNavigation.EndNodeNavigation))
+                {
+                    disabledMovement.Add(d.StartEdgeNavigation.EndNodeNavigation, new List<DisabledMovement>());
+                }
+                disabledMovement[d.StartEdgeNavigation.EndNodeNavigation].Add(d);
+            }
+        }
+
+        public static void PrepareDisabledMovementGraph()
+        {
             foreach (var n in DisabledMovementGraph)
             {
                 NodesDisabledAll.AddLast(n.Value);
@@ -100,24 +118,6 @@ namespace RoutingProblem.Services
                 }
             }
 
-            PrepareDisabledMovement(disabledMovements);
-            PrepareDisabledMovementGraph();
-        }
-
-        private static void PrepareDisabledMovement(IQueryable<DisabledMovement> disabledMovements)
-        {
-            foreach (var d in disabledMovements)
-            {
-                if (!disabledMovement.Keys.Contains(d.StartEdgeNavigation.EndNodeNavigation))
-                {
-                    disabledMovement.Add(d.StartEdgeNavigation.EndNodeNavigation, new List<DisabledMovement>());
-                }
-                disabledMovement[d.StartEdgeNavigation.EndNodeNavigation].Add(d);
-            }
-        }
-
-        public static void PrepareDisabledMovementGraph()
-        {
             foreach (var n in DisabledMovementGraph)
             {
                 if (NodesTempEnd.Keys.Contains(n.Key))

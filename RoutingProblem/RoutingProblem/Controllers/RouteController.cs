@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RoutingProblem.Data;
 using RoutingProblem.Models;
 using RoutingProblem.Services;
+using RoutingProblem.Services.Data;
 
 namespace RoutingProblem.Controllers
 {
@@ -23,7 +23,7 @@ namespace RoutingProblem.Controllers
         LabelSet labelSet = new LabelSet();
         DuplexDijkster duplexDijkster = new DuplexDijkster();
         MultiLabel multiLabel = new MultiLabel();
-        TimeSpan timeItTook;
+        TimeSpan time;
 
         [HttpGet]
         [Route("zakladny/{startLatLon}/{endLatLon}")]
@@ -32,7 +32,7 @@ namespace RoutingProblem.Controllers
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = zakladny.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value, PrepareData.NodesGraph);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             return AfterCalculateShortestPath(node);
         }
 
@@ -43,7 +43,7 @@ namespace RoutingProblem.Controllers
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = dijkster.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             return AfterCalculateShortestPath(node);
         }
 
@@ -54,7 +54,7 @@ namespace RoutingProblem.Controllers
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = astar.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             return AfterCalculateShortestPath(node);
         }
 
@@ -65,7 +65,7 @@ namespace RoutingProblem.Controllers
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = labelCorrect.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             return AfterCalculateShortestPath(node);
         }
 
@@ -76,7 +76,7 @@ namespace RoutingProblem.Controllers
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = labelSet.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             return AfterCalculateShortestPath(node);
         }
 
@@ -87,7 +87,7 @@ namespace RoutingProblem.Controllers
             KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> nodes = BeforeCalculateShortestPath(startLatLon, endLatLon);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = duplexDijkster.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             return AfterCalculateShortestPathDuplex(node);
         }
 
@@ -99,7 +99,7 @@ namespace RoutingProblem.Controllers
             multiLabel.K = Int32.Parse(k);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = multiLabel.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             return AfterCalculateShortestPathMultiLabel(node);
         }
 
@@ -111,7 +111,7 @@ namespace RoutingProblem.Controllers
             PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = zakladny.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value, PrepareData.NodesDisabledAll);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             RoutesDTO routes = AfterCalculateShortestPath(node);
             PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
             return routes;
@@ -125,7 +125,7 @@ namespace RoutingProblem.Controllers
             PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = dijkster.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             RoutesDTO routes = AfterCalculateShortestPath(node);
             PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
             return routes;
@@ -139,7 +139,7 @@ namespace RoutingProblem.Controllers
             PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = astar.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             RoutesDTO routes = AfterCalculateShortestPath(node);
             PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
             return routes;
@@ -153,7 +153,7 @@ namespace RoutingProblem.Controllers
             PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = labelCorrect.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             RoutesDTO routes = AfterCalculateShortestPath(node);
             PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
             return routes;
@@ -167,7 +167,7 @@ namespace RoutingProblem.Controllers
             PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = labelSet.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             RoutesDTO routes = AfterCalculateShortestPath(node);
             PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
             return routes;
@@ -181,7 +181,7 @@ namespace RoutingProblem.Controllers
             PrepareData.PutStartEnd(nodes.Key.Key, nodes.Value.Key);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = duplexDijkster.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             RoutesDTO routes = AfterCalculateShortestPathDuplex(node);
             PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
             return routes;
@@ -196,7 +196,7 @@ namespace RoutingProblem.Controllers
             multiLabel.K = Int32.Parse(k);
             DateTime start = DateTime.Now;
             NodeGraphDTO node = multiLabel.CalculateShortestPath(nodes.Key.Value, nodes.Value.Value);
-            timeItTook = DateTime.Now - start;
+            time = DateTime.Now - start;
             RoutesDTO routes = AfterCalculateShortestPathMultiLabel(node);
             PrepareData.RemoveStartEnd(nodes.Key.Key, nodes.Value.Key);
             return routes;
@@ -335,7 +335,7 @@ namespace RoutingProblem.Controllers
                 PocetHranCesty = nodeRoute.Count,
                 PocetNavstivenychHran = Utils.PocetNavstivenychHran,
                 DlzkaCesty = Math.Round(nodeCon.CurrentDistance, 5),
-                CasVypoctu = timeItTook.Milliseconds,
+                CasVypoctu = time.Milliseconds,
                 Nodes = nodeRoute
             };
 
@@ -377,7 +377,7 @@ namespace RoutingProblem.Controllers
                 PocetHranCesty = nodeRoute.Count,
                 PocetNavstivenychHran = Utils.PocetNavstivenychHran,
                 DlzkaCesty = Math.Round(nodeCon.CurrentDistance, 5),
-                CasVypoctu = timeItTook.Milliseconds,
+                CasVypoctu = time.Milliseconds,
                 Nodes = nodeRoute
             };
 
@@ -417,7 +417,7 @@ namespace RoutingProblem.Controllers
                     PocetHranCesty = nodeRoute.Count,
                     PocetNavstivenychHran = Utils.PocetNavstivenychHran,
                     DlzkaCesty = Math.Round(nodeCon.MultiLabelMark[n.K - 1].T, 5),
-                    CasVypoctu = timeItTook.Milliseconds,
+                    CasVypoctu = time.Milliseconds,
                     Nodes = nodeRoute
                 };
                 routes.Route.AddLast(route);

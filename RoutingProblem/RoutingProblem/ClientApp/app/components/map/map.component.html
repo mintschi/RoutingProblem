@@ -1,8 +1,8 @@
 ﻿<div id="map" class="map"></div>
 <div id="loading" *ngIf="load">
-    <img id="loading-gif" src="loading-gif.gif" alt="Načítavanie...">
+    <img id="loading-gif" src="images/loading-gif.gif" alt="Načítavanie...">
 </div>
-<!--<label class="open-button" *ngIf="!show" (click)="openForm()"></label>-->
+
 <button type="button" (click)="openForm()" class="name labelRoute open-button" *ngIf="!show">
     <label>Problémy trasovania v rozsiahlych sietach</label>
     <span>
@@ -11,7 +11,6 @@
         <div class="menu"></div>
     </span>
 </button>
-
 
 <div class="form-popup form-container" id="myForm" *ngIf="show">
 
@@ -27,7 +26,7 @@
     </div>
 
     <div class="coordinates">
-        <img class="image" src="mapMarkerChange.png" (click)="changeStartEnd()" alt="change" width="30" height="92" title="Zmeniť začiatok a cieľ jazdy">
+        <img class="image" src="images/mapMarkerChange.png" (click)="changeStartEnd()" alt="change" width="30" height="92" title="Zmeniť začiatok a cieľ jazdy">
         <div class="coordinates-text">
             <input type="text" placeholder="Zvoľte začiatok trasy kliknutím na mapu" [value]="startLatLon" required>
             <input type="text" placeholder="Zvoľte cieľ trasy kliknutím na mapu" [value]="endLatLon" required>

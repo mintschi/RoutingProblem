@@ -10,7 +10,7 @@ using System.Net;
 using System.Web;
 using System.Xml;
 
-namespace RoutingProblem.Data
+namespace RoutingProblem.Services.Data
 {
     public class SpracovanieOSMDat
     {

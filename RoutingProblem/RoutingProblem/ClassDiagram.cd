@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="RoutingProblem.Models.Data">
+    <Position X="4" Y="1.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAADAAAEAAIAAAAABgAAgAAAAgAABAAAAEAAA=</HashCode>
+      <FileName>Models\Data.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Models.DisabledMovement">
+    <Position X="4" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABEBAEEAAAAAAAAAAAAAAAAACAAAABAAAAAAAA=</HashCode>
+      <FileName>Models\DisabledMovement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Models.Edge">
+    <Position X="6" Y="4.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAJAAQAAIAAAAAAEAAAAAAAAAAMQAgBAAEAAAAA=</HashCode>
+      <FileName>Models\Edge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Models.Node">
+    <Position X="7" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAACAAAAAAAAACABAAAAgIAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Models\Node.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Models.NodeLocationDTO">
+    <Position X="10.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\NodeLocationDTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Models.RouteDTO">
+    <Position X="10" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AQAgAAgAAAAAAAIAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\RouteDTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Models.RoutesDTO">
+    <Position X="10.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\RoutesDTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.AStar">
+    <Position X="16" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAQAA=</HashCode>
+      <FileName>Services\AStar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.Dijkster">
+    <Position X="13.5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAQAA=</HashCode>
+      <FileName>Services\Dijkster.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.DuplexDijkster">
+    <Position X="13.5" Y="2.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AQAAACAAAAAAAAEACAAYAAAAAAAAABAABgAAAAAAQAA=</HashCode>
+      <FileName>Services\DuplexDijkster.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.LabelCorrect">
+    <Position X="18.5" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\LabelCorrect.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.LabelSet">
+    <Position X="16" Y="2.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAQAA=</HashCode>
+      <FileName>Services\LabelSet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.MultiLabel">
+    <Position X="18.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAgAIAAAAA=</HashCode>
+      <FileName>Services\MultiLabel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.Zakladny">
+    <Position X="16" Y="4.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Zakladny.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.Data.SpracovanieOSMDat">
+    <Position X="20.5" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Data\SpracovanieOSMDat.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.Data.PrepareData">
+    <Position X="21" Y="0.5" Width="6.75" />
+    <TypeIdentifier>
+      <HashCode>AAEhAAAAAACAEAAAAAAAAABEAUEAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Services\Data\PrepareData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoutingProblem.Services.Data.Utils">
+    <Position X="22.5" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAIAAAhAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Data\Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
