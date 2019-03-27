@@ -1,4 +1,4 @@
-﻿import { MapHttpService } from '../../services/maphttpservice.service';
+﻿import { MapHttpService } from '../../controllers/maphttpcontroller.service';
 import { Component, OnInit } from '@angular/core';
 import { Event } from '@angular/router';
 import { forEach } from '@angular/router/src/utils/collection';
