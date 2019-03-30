@@ -33,7 +33,7 @@ export class MapHttpService {
 
     downloadData(title: string, minLat: string, minLon: string, maxLat: string, maxLon: string): Promise<any> {
         return this._http.get('/api/Route/data/' + title + '/' + minLat + '/' + minLon + '/' + maxLat + '/' + maxLon)
-            .map((response: Response) => response.json() as boolean)
+            .map((response: Response) => response.json() as Array<IField>)
             .toPromise();
     }
 

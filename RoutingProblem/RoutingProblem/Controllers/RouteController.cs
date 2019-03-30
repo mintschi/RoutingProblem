@@ -204,7 +204,7 @@ namespace RoutingProblem.Controllers
 
         [HttpGet]
         [Route("data/{title}/{minLat}/{minLon}/{maxLat}/{maxLon}")]
-        public bool DownloadData(string title, float minLat, float minLon, float maxLat, float maxLon)
+        public LinkedList<KeyValuePair<decimal, string[]>> DownloadData(string title, float minLat, float minLon, float maxLat, float maxLon)
         {
             decimal id = dopravnaSietContext.Data.Max(d => d.IdData);
             dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault().Active = false;
@@ -221,7 +221,26 @@ namespace RoutingProblem.Controllers
             });
             Models.Data data = dopravnaSietContext.Data.Where(d => d.Active == true).FirstOrDefault();
             PrepareData.PrepareNodesGraph(dopravnaSietContext.Node.Where(d => d.IdData == data.IdData), dopravnaSietContext.DisabledMovement.Where(d => d.IdData == data.IdData));
-            return true;
+            LinkedList<KeyValuePair<decimal, string[]>> array = new LinkedList<KeyValuePair<decimal, string[]>>();
+            foreach (Models.Data d in dopravnaSietContext.Data)
+            {
+                string[] field = new string[5] {
+                        d.Title,
+                        d.MinLat.ToString(CultureInfo.InvariantCulture),
+                        d.MinLon.ToString(CultureInfo.InvariantCulture),
+                        d.MaxLat.ToString(CultureInfo.InvariantCulture),
+                        d.MaxLon.ToString(CultureInfo.InvariantCulture) };
+                if (d.Active)
+                {
+                    array.AddFirst(new KeyValuePair<decimal, string[]>(d.IdData, field));
+                }
+                else
+                {
+                    array.AddLast(new KeyValuePair<decimal, string[]>(d.IdData, field));
+                }
+
+            }
+            return array;
         }
 
         [HttpPost]
@@ -238,22 +257,34 @@ namespace RoutingProblem.Controllers
 
         [HttpGet]
         [Route("fields")]
-        public LinkedList<KeyValuePair<decimal, string>> LoadFields()
+        public LinkedList<KeyValuePair<decimal, string[]>> LoadFields()
         {
-            LinkedList<KeyValuePair<decimal, string>> array = new LinkedList<KeyValuePair<decimal, string>>();
+            LinkedList<KeyValuePair<decimal, string[]>> array = new LinkedList<KeyValuePair<decimal, string[]>>();
             foreach (Models.Data data in dopravnaSietContext.Data)
             {
+                string[] field = new string[5] {
+                        data.Title,
+                        data.MinLat.ToString(CultureInfo.InvariantCulture),
+                        data.MinLon.ToString(CultureInfo.InvariantCulture),
+                        data.MaxLat.ToString(CultureInfo.InvariantCulture),
+                        data.MaxLon.ToString(CultureInfo.InvariantCulture) };
                 if (data.Active)
                 {
-                    array.AddFirst(new KeyValuePair<decimal, string> (data.IdData, data.Title));
+                    array.AddFirst(new KeyValuePair<decimal, string[]> (data.IdData, field));
                 } else
                 {
-                    array.AddLast(new KeyValuePair<decimal, string>(data.IdData, data.Title));
+                    array.AddLast(new KeyValuePair<decimal, string[]>(data.IdData, field));
                 }
                 
             }
             return array;
         }
+
+        //[HttpGet]
+        //[Route("statistics")]
+        //public LinkedList<KeyValuePair<decimal, string[]>> Statistics()
+        //{
+        //}
 
         private KeyValuePair<KeyValuePair<Node, NodeGraphDTO>, KeyValuePair<Node, NodeGraphDTO>> BeforeCalculateShortestPath(string startLatLon, string endLatLon)
         {

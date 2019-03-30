@@ -1,10 +1,9 @@
-﻿<div id="map" class="map"></div>
-<div id="loading" *ngIf="load">
+﻿<div id="loading" *ngIf="load">
     <img id="loading-gif" src="images/loading-gif.gif" alt="Načítavanie...">
 </div>
 
 <button type="button" (click)="openForm()" class="name labelRoute open-button" *ngIf="!show">
-    <label>Problémy trasovania v rozsiahlych sietach</label>
+    <label>Problémy trasovania v rozsiahlych sieťach</label>
     <span>
         <div class="menu"></div>
         <div class="menu"></div>
@@ -12,87 +11,98 @@
     </span>
 </button>
 
-<div class="form-popup form-container" id="myForm" *ngIf="show">
+<div class="site">
+    <div id="map" class="map"></div>
+    <div class="form-popup form-container" id="myForm" *ngIf="show">
 
-    <div class="name">
-        <label>Problémy trasovania v rozsiahlych sietach</label>
-        <button type="button" (click)="closeForm()" class="labelRoute"><b>>></b></button>
-    </div>
-
-    <div class="route">
-        <button type="button" (click)="betterRoute()" class="labelRoute" [disabled]="idRoute === 0" *ngIf="routesCount > 0"><b><</b></button>
-        <h2 class="labelRoute"><b>Trasa <span *ngIf="routesCount > 0">{{idRoute+1}}</span></b></h2>
-        <button type="button" (click)="worseRoute()" class="labelRoute" [disabled]="idRoute === routesCount" *ngIf="routesCount > 0"><b>></b></button>
-    </div>
-
-    <div class="coordinates">
-        <img class="image" src="images/mapMarkerChange.png" (click)="changeStartEnd()" alt="change" width="30" height="92" title="Zmeniť začiatok a cieľ jazdy">
-        <div class="coordinates-text">
-            <input type="text" placeholder="Zvoľte začiatok trasy kliknutím na mapu" [value]="startLatLon" required>
-            <input type="text" placeholder="Zvoľte cieľ trasy kliknutím na mapu" [value]="endLatLon" required>
+        <div class="name">
+            <label>Problémy trasovania v rozsiahlych sieťach</label>
+            <button type="button" (click)="closeForm()" class="labelRoute"><b>>></b></button>
         </div>
+
+        <div class="route">
+            <button type="button" (click)="betterRoute()" class="labelRoute" [disabled]="idRoute === 0" *ngIf="routesCount > 0"><b><</b></button>
+            <h2 class="labelRoute"><b>Cesta <span *ngIf="routesCount > 0">{{idRoute+1}}</span></b></h2>
+            <button type="button" (click)="worseRoute()" class="labelRoute" [disabled]="idRoute === routesCount" *ngIf="routesCount > 0"><b>></b></button>
+        </div>
+
+        <div class="coordinates">
+            <img class="image" src="images/mapMarkerChange.png" (click)="changeStartEnd()" alt="change" width="30" height="92" title="Zmeniť začiatok a cieľ jazdy">
+            <div class="coordinates-text">
+                <input type="text" placeholder="Zvoľte začiatok trasy kliknutím na mapu" [value]="startLatLon" disabled required>
+                <input type="text" placeholder="Zvoľte cieľ trasy kliknutím na mapu" [value]="endLatLon" disabled required>
+            </div>
+        </div>
+
+        <table>
+            <tr>
+                <td width="50%">Dĺžka cesty:</td>
+                <td>{{route.dlzkaCesty}} <span *ngIf="routesCount > -1">metrov</span></td>
+            </tr>
+            <tr>
+                <td>Čas výpočtu:</td>
+                <td>{{route.casVypoctu}} <span *ngIf="routesCount > -1">milisekúnd</span></td>
+            </tr>
+            <tr>
+                <td>Počet hrán cesty:</td>
+                <td>{{route.pocetHranCesty}}</td>
+            </tr>
+            <tr>
+                <td>Počet navštívených hrán:</td>
+                <td>{{route.pocetNavstivenychHran}}</td>
+            </tr>
+        </table>
+
+        <div class="form-option">
+            <label id="lblOptions">Možnosti</label><br />
+            <div class="option">
+                <label>Algoritmus:</label><br />
+                <div class="row">
+                    <div class="column">
+                        <input type="radio" name="type" value="zakladny" [checked]="type === 'zakladny'" (click)="type = 'zakladny';modifyend();"> Základný<br />
+                        <input type="radio" name="type" value="labelcorrect" [checked]="type === 'labelcorrect'" (click)="type = 'labelcorrect';modifyend();"> Label Correct<br />
+                        <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar';modifyend();"> A-Star<br />
+                        <input type="radio" name="type" value="multilabel" [checked]="type === 'multilabel'" (click)="type = 'multilabel'"> Multi Label<br />
+                    </div>
+                    <div class="column-r">
+                        <input type="radio" name="type" value="dijkster" [checked]="type === 'dijkster'" (click)="type = 'dijkster';modifyend();"> Dijkstra<br />
+                        <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset';modifyend();"> Label Set<br />
+                        <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster';modifyend();"> Duplex dijkstra<br />
+                        <input id="k" type="text" placeholder="počet trás" *ngIf="type === 'multilabel'" (blur)="modifyend()" required>
+                        <!--<input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
+                        <input type="radio" name="routeType" value="najrychlejsia" [checked]="routeType === 'najrychlejsia'" (click)="routeType = 'najrychlejsia'"> najrýchlejšia<br>
+                        <input type="radio" name="routeType" value="najjednoduchsia" [checked]="routeType === 'najjednoduchsia'" (click)="routeType = 'najjednoduchsia'"> najjednoduchšia-->
+                    </div>
+                </div>
+                <label>Zakázané manévre:</label><br />
+                <div class="">
+                    <label class="interactive"><input type="checkbox" (change)="disabledM($event)" [checked]="disabled === 'disabled'"> Vyhľadať so zakázanými manévrami</label><br />
+                </div>
+                <label>Interaktívne hľadanie cesty:</label><br />
+                <div class="">
+                    <label class="interactive"><input type="checkbox" (change)="interactive($event)" [checked]="interactiveRoute === true"> Automaticky vyhľadať</label><br />
+                </div>
+                <label>Oblasť:</label><br />
+                <div class="field">
+                    <select name="f" class="interactive" (ngModelChange)="setData($event)" (ngModel)="f" id="select">
+                        <option *ngFor="let field of fields" [ngValue]="field">{{field.value[0]}}</option>
+                    </select><br />
+                </div>
+            </div>
+
+        </div>
+        <!--<div class="div-find">-->
+        <button id="btnFindRoute" type="button" (click)="findRoute()" class="btn" [disabled]="disableFind" *ngIf="interactiveRoute === false">Nájsť</button>
+        <!--</div>-->
     </div>
+</div>
 
-    <table>
-        <tr>
-            <td width="50%">Dĺžka cesty:</td>
-            <td>{{route.dlzkaCesty}} <span *ngIf="routesCount > -1">metrov</span></td>
-        </tr>
-        <tr>
-            <td>Čas výpočtu:</td>
-            <td>{{route.casVypoctu}} <span *ngIf="routesCount > -1">milisekúnd</span></td>
-        </tr>
-        <tr>
-            <td>Počet hrán cesty:</td>
-            <td>{{route.pocetHranCesty}}</td>
-        </tr>
-        <tr>
-            <td>Počet navštívených hrán:</td>
-            <td>{{route.pocetNavstivenychHran}}</td>
-        </tr>
-    </table>
-
-    <div class="form-option">
-        <label id="lblOptions">Možnosti</label><br />
-                                               <div class="option">
-                                                   <label>Algoritmus:</label><br />
-                                                   <div class="row">
-                                                       <div class="column">
-                                                           <input type="radio" name="type" value="zakladny" [checked]="type === 'zakladny'" (click)="type = 'zakladny';modifyend();"> Základný<br />
-                                                           <input type="radio" name="type" value="labelcorrect" [checked]="type === 'labelcorrect'" (click)="type = 'labelcorrect';modifyend();"> Label Correct<br />
-                                                           <input type="radio" name="type" value="astar" [checked]="type === 'astar'" (click)="type = 'astar';modifyend();"> A-Star<br />
-                                                           <input type="radio" name="type" value="multilabel" [checked]="type === 'multilabel'" (click)="type = 'multilabel'"> Multi Label<br />
-                                                           <label id="pocet-tras" *ngIf="type === 'multilabel'">Počet trás:</label>
-                                                       </div>
-                                                       <div class="column">
-                                                           <input type="radio" name="type" value="dijkster" [checked]="type === 'dijkster'" (click)="type = 'dijkster';modifyend();"> Dijkstra<br />
-                                                           <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset';modifyend();"> Label Set<br />
-                                                           <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster';modifyend();"> Duplex dijkstra<br />
-                                                           <label> </label><br />
-                                                           <input id="k" type="text" *ngIf="type === 'multilabel'" (blur)="modifyend()" required>
-                                                           <!--<input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
-            <input type="radio" name="routeType" value="najrychlejsia" [checked]="routeType === 'najrychlejsia'" (click)="routeType = 'najrychlejsia'"> najrýchlejšia<br>
-            <input type="radio" name="routeType" value="najjednoduchsia" [checked]="routeType === 'najjednoduchsia'" (click)="routeType = 'najjednoduchsia'"> najjednoduchšia-->
-                                                       </div>
-                                                   </div>
-                                                   <label>Zakázané manévre:</label><br />
-                                                   <div class="">
-                                                       <label class="interactive"><input type="checkbox" (change)="disabledM($event)" [checked]="disabled === 'disabled'"> Vyhľadať so zakázanými manévrami</label><br />
-                                                   </div>
-                                                   <label>Interaktívne hľadanie trasy:</label><br />
-                                                   <div class="column">
-                                                       <label class="interactive"><input type="checkbox" (change)="interactive($event)" [checked]="interactiveRoute === true"> Automaticky vyhľadať</label><br />
-                                                   </div>
-                                                   <label>Oblasť:</label><br />
-                                                   <div class="column">
-                                                       <select class="interactive" (change)="setData($event.target.value)" id="select">
-                                                           <option [selected]="selectedField == field.key" value="{{field.key}}" *ngFor="let field of fields">{{field.value}}</option>
-                                                       </select><br />
-                                                   </div>
-                                               </div>
-
+<div id="downloadform" (mouseenter)="dragElement()" class="form-container download-form" *ngIf="download">
+    <div id="downloadheader" class="download">
+        <label>Stiahnutie dát</label>
+        <button type="button" (click)="closeDownload()" class="labelRoute"><b>X</b></button>
     </div>
-    <!--<div class="div-find">-->
-        <button id="btnFindRoute" type="button" (click)="findRoute()" class="btn" [disabled]="disableFind" *ngIf="interactiveRoute === false">Find</button>
-    <!--</div>-->
+    <input id="title" class="coordinates-text" type="text" placeholder="Zadajte názov oblasti/dát" [value]="title" required>
+    <label class="povinny" *ngIf="required">*názov je povinný</label>
+    <button id="btnFindRoute" type="button" (click)="downloadData()" class="btn">Stiahnúť</button>
 </div>

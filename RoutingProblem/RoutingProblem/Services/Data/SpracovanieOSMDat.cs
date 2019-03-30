@@ -23,10 +23,14 @@ namespace RoutingProblem.Services.Data
             var edges = new List<Edge>();
             var disabledMovements = new List<DisabledMovement>();
             var zeroString = "0000000000000";
-            xmlReader.Load("C:\\Users\\Martin\\Downloads\\BasicOSMParser-master\\BasicOSMParser-master\\OSM_nove.osm");
+            //xmlReader.Load("C:\\Users\\Martin\\Downloads\\BasicOSMParser-master\\BasicOSMParser-master\\OSM_nove.osm");
             using (WebClient wc = new WebClient())
             {
-                var xml = wc.DownloadString("http://www.overpass-api.de/api/xapi?map?bbox=18.5738,49.1094,19.0112,49.2826[@meta]");
+                var xml = wc.DownloadString("http://www.overpass-api.de/api/xapi?map?bbox=" 
+                    + data.MinLon.ToString(CultureInfo.InvariantCulture) + "," 
+                    + data.MinLat.ToString(CultureInfo.InvariantCulture) + "," 
+                    + data.MaxLon.ToString(CultureInfo.InvariantCulture) + "," 
+                    + data.MaxLat.ToString(CultureInfo.InvariantCulture) + "[@meta]");
                 xmlReader.LoadXml(xml);
             }
 

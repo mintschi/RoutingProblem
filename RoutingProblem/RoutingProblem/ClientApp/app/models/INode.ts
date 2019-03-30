@@ -1,7 +1,7 @@
 ﻿import { Injectable } from '@angular/core';
 import { Http, HttpModule } from '@angular/http';
 
-export interface IField {
-    key: number;
-    value: Array<string>;
+export interface INode {
+    Lat: number;
+    Lon: number;
 }

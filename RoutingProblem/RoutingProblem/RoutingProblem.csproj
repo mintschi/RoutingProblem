@@ -29,17 +29,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\app\services\maphttp.service.ts" />
-    <None Remove="ClientApp\app\models\IData.ts" />
-    <None Remove="ClientApp\app\models\IField.ts" />
+    <None Remove="ClientApp\app\models\INode.ts" />
     <None Remove="ClientApp\app\models\IRoute.ts" />
+    <None Remove="ClientApp\app\services\maphttp.service.ts" />
+    <None Remove="ClientApp\app\models\IField.ts" />
     <None Remove="ClientApp\app\models\IRoutes.ts" />
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\app\models\IData.ts" />
-    <TypeScriptCompile Include="ClientApp\app\models\IField.ts" />
     <TypeScriptCompile Include="ClientApp\app\models\IRoute.ts" />
+    <TypeScriptCompile Include="ClientApp\app\models\IField.ts" />
+    <TypeScriptCompile Include="ClientApp\app\models\INode.ts" />
     <TypeScriptCompile Include="ClientApp\app\models\IRoutes.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\maphttp.service.ts" />
   </ItemGroup>

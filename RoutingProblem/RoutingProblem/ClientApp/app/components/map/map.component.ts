@@ -8,8 +8,10 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import { style } from '@angular/animations';
 import { IRoutes } from '../../models/IRoutes';
-import { IData } from '../../models/IData';
+import { INode } from '../../models/INode';
 import { IField } from '../../models/IField';
+import { Title } from '@angular/platform-browser';
+import { assertNotNull } from '@angular/compiler/src/output/output_ast';
 
 declare var ol: any;
 
@@ -38,10 +40,14 @@ export class MapComponent implements OnInit {
     public idData: string = "5";
     public load: boolean = false;
     private source: any;
+    private title: string = "";
+    private box: any;
+    private modify: any;
 
-    constructor(private service: MapHttpService) { }
+    constructor(private service: MapHttpService, private titleService: Title) { }
 
     ngOnInit() {
+        this.titleService.setTitle("Problémy trasovania");
         var latitude: number = 49.2122189;
         var longitude: number = 18.7486345;
         var name: number = 0;
@@ -61,20 +67,43 @@ export class MapComponent implements OnInit {
             }
         });
 
+        var dragBoxInteraction = new ol.interaction.DragBox({
+            condition: ol.events.condition.shiftKeyOnly,
+        });
+
+        dragBoxInteraction.on('boxend', (e: any) => {
+            var format = new ol.format.GeoJSON();
+            var geom = e.target.getGeometry();
+            this.download = true;
+            this.title = "";
+            this.box = new ol.Feature({
+                geometry: new ol.geom.LineString(geom.getCoordinates()[0]),
+            });
+            this.map.removeInteraction(this.modify);
+            source.addFeature(this.box);
+        });
+
         this.map = new ol.Map({
             controls: ol.control.defaults().extend([new ol.control.ScaleLine]),
             layers: [raster, this.vector],
+            interactions: ol.interaction.defaults({
+                shiftDragZoom: false,
+                altShiftDragRotate: false
+            }).extend([dragBoxInteraction]),
             target: 'map',
             view: new ol.View({
-                center: ol.proj.fromLonLat([longitude, latitude]),
-                zoom: 13
             }),
         });
+
+        //this.map.on("change:size", (evt: any) => {
+        //    this.map.updateSize();
+        //});
 
         var startLonLat: any;
         var endLonLat: any;
 
         this.map.on("click", (evt: any) => {
+            if (this.download) return;
             var style = "";
             if (source.getFeatures().length == 0) {
                 style = "start";
@@ -123,11 +152,11 @@ export class MapComponent implements OnInit {
             }
         });
 
-        var modify = new ol.interaction.Modify({ source: source });
-        this.map.addInteraction(modify);
+        this.modify = new ol.interaction.Modify({ source: source });
+        this.map.addInteraction(this.modify);
 
-        modify.on("modifyend", (evt: any) => {
-            this.modifyend();
+        this.modify.on("modifyend", (evt: any) => {
+            this.modifyend(true);
         });
 
         this.loadFields();
@@ -137,7 +166,7 @@ export class MapComponent implements OnInit {
     public featureLineStart: any;
     public featureLineEnd: any;
     public routes: IRoutes = new Object() as IRoutes;
-    public route: IData = new Object() as IData;
+    public route: IRoute = new Object() as IRoute;
     public idRoute: any = 0;
     public routesCount: any = -1;
     findRoute() {
@@ -188,13 +217,22 @@ export class MapComponent implements OnInit {
             })
     }
 
-    modifyend() {
+    modifyend(find: boolean = true) {
         if (!this.disableFind && this.routeLayer != null) {
             if (this.interactiveRoute) {
                 this.map.removeLayer(this.routeLayer);
                 this.featureLineStart = null;
                 this.featureLineEnd = null;
-                this.findRoute();
+                this.idRoute = 0;
+                if (find) {
+                    this.findRoute();
+                } else {
+                    this.source.removeFeature(this.startPointFeature);
+                    this.source.removeFeature(this.endPointFeature);
+                    this.startLatLon = "";
+                    this.endLatLon = "";
+                    this.route = <IRoute>new Object;
+                }
             }
         }
     }
@@ -202,13 +240,13 @@ export class MapComponent implements OnInit {
     interactive(evt: any) {
         this.interactiveRoute = evt.target.checked;
         if (this.interactiveRoute == true) {
-            this.modifyend();
+            this.modifyend(true);
         }
     }
 
     disabledM(evt: any) {
         this.disabled = evt.target.checked ? 'disabled' : '';
-        this.modifyend();
+        this.modifyend(true);
     }
 
     changeStartEnd() {
@@ -220,7 +258,7 @@ export class MapComponent implements OnInit {
             this.endLatLon = startLatLon;
             this.source.getFeatures()[0].getGeometry().setCoordinates(ol.proj.transform([+e[1], +e[0]], 'EPSG:4326', 'EPSG:3857'));
             this.source.getFeatures()[0].getGeometry().setCoordinates(ol.proj.transform([+s[1], +s[0]], 'EPSG:4326', 'EPSG:3857'));
-            this.modifyend();
+            this.modifyend(true);
         }
     }
 
@@ -238,17 +276,48 @@ export class MapComponent implements OnInit {
         } 
     }
 
+    closeDownload() {
+        this.download = false;
+        this.required = false;
+        this.map.addInteraction(this.modify);
+        this.source.removeFeature(this.box);
+    }
+
+    public download = false;
+    public required = false;
     downloadData() {
-        //this.service.downloadData(this.title, );
+        try {
+            this.title = (<HTMLInputElement>document.getElementById("title")).value;
+        } catch (e) {
+
+        }
+        if (this.title == "") {
+            this.required = true;
+            return;
+        }
+        this.closeDownload();
+        this.load = true;
+        var minLonLat = ol.proj.transform(this.box.getGeometry().getCoordinates()[1], 'EPSG:3857', 'EPSG:4326');
+        var maxLonLat = ol.proj.transform(this.box.getGeometry().getCoordinates()[3], 'EPSG:3857', 'EPSG:4326');
+        this.service.downloadData(this.title, minLonLat[1], minLonLat[0], maxLonLat[1], maxLonLat[0])
+            .then((response: Array<IField>) => {
+                this.fields = response;
+                this.selectedField = this.fields[0];
+                this.load = false;
+                this.modifyend(false);
+                this.addExtent();
+            });
     }
 
     setData(evt: any) {
         this.load = true;
-        this.service.setData(evt)
+        this.service.setData(evt.key)
             .then((response: boolean) => {
                 if (response) {
                     this.selectedField = evt;
                     this.load = false;
+                    this.modifyend(false);
+                    this.addExtent();
                 }
             });
     }
@@ -259,17 +328,57 @@ export class MapComponent implements OnInit {
         this.service.loadFields()
             .then((response: Array<IField>) => {
                 this.fields = response;
+                this.selectedField = this.fields[0];
+                this.addExtent();
             });
     }
 
     openForm() {
         this.show = true;
+        //(<HTMLDivElement>document.getElementById('map')).style.width = 'calc(100vw - 360px)';
     }
 
     closeForm() {
         this.show = false;
+        //(<HTMLDivElement>document.getElementById('map')).style.width = '100vw';
     }
 
+    //extent
+    private extentLayer: any;
+    private zoomToExtentControl: any;
+    addExtent() {
+        this.map.removeLayer(this.extentLayer);
+        var source = new ol.source.Vector({ wrapX: false });
+        this.extentLayer = new ol.layer.Vector({
+            source: source,
+            style: (feature: any) => {
+                return this.getStyle(feature.get('type'));
+            }
+        });
+
+        var feature = new ol.Feature({
+            geometry: new ol.geom.LineString([
+                ol.proj.fromLonLat([+this.selectedField.value[4], +this.selectedField.value[1]]),
+                ol.proj.fromLonLat([+this.selectedField.value[4], +this.selectedField.value[3]]),
+                ol.proj.fromLonLat([+this.selectedField.value[2], +this.selectedField.value[3]]),
+                ol.proj.fromLonLat([+this.selectedField.value[2], +this.selectedField.value[1]]),
+                ol.proj.fromLonLat([+this.selectedField.value[4], +this.selectedField.value[1]])]),
+            type: 'extent'
+        });
+        source.addFeature(feature);
+        this.map.addLayer(this.extentLayer);
+
+        this.map.removeControl(this.zoomToExtentControl);
+        var extent = ol.proj.transformExtent([+this.selectedField.value[2], +this.selectedField.value[1],
+        +this.selectedField.value[4], +this.selectedField.value[3]], 'EPSG:4326', 'EPSG:3857');
+        this.zoomToExtentControl = new ol.control.ZoomToExtent({
+            extent: extent
+        });
+        this.map.addControl(this.zoomToExtentControl);
+        this.map.getView().fit(extent, this.map.getSize());
+    }
+
+    //styles
     getStyle(style: any) {
         if (style === 'line') {
             return new ol.style.Style({
@@ -279,7 +388,15 @@ export class MapComponent implements OnInit {
                     lineDash: [1.5, 10]
                 })
             });
-        } else if (style === 'start') {
+        } else if (style === 'extent') {
+            return new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0, 0, 200, 0.8)',
+                    width: 6,
+                    lineDash: [1.5, 10]
+                })
+            });
+        }else if (style === 'start') {
             return new ol.style.Style({
                 image: new ol.style.Icon({
                     anchor: [0.5045, 1],
@@ -300,7 +417,7 @@ export class MapComponent implements OnInit {
             image: new ol.style.Circle({
                 radius: 6,
                 fill: new ol.style.Fill({
-                    color: 'rgba(122, 122, 122, 0.8)'
+                    color: 'rgba(77, 77, 77, 0.8)'
                 }),
                 stroke: new ol.style.Stroke({
                     color: 'white',
@@ -308,9 +425,68 @@ export class MapComponent implements OnInit {
                 })
             }),
             stroke: new ol.style.Stroke({
-                color: 'rgba(122, 122, 122, 0.8)',
+                color: 'rgba(77, 77, 77, 0.8)',
                 width: 6
             })
         });
+    }
+
+    //download data
+    dragElement() {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        var elmnt: any;
+        try {
+            elmnt = <HTMLDivElement>document.getElementById("downloadform");
+        } catch (e) {
+
+        }
+        if (document.getElementById("downloadheader")) {
+            (<HTMLDivElement>document.getElementById("downloadheader")).onmousedown = dragMouseDown;
+        } else {
+            elmnt.onmousedown = dragMouseDown;
+        }
+
+        function dragMouseDown(e: any) {
+            e = e || window.event;
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e: any) {
+            e = e || window.event;
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+
+            if (elmnt.offsetTop >= 0 && elmnt.offsetLeft >= 0 && elmnt.offsetTop + elmnt.offsetHeight <= window.innerHeight
+                && elmnt.offsetLeft + elmnt.offsetWidth <= window.innerWidth) {
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+            if (elmnt.offsetTop < 0) {
+                elmnt.style.top = 0 + "px";
+            } else if (elmnt.offsetTop + elmnt.offsetHeight > window.innerHeight) {
+                elmnt.style.top = window.innerHeight - elmnt.offsetHeight + "px";
+            }
+            if (elmnt.offsetLeft < 0) {
+                elmnt.style.left = 0 + "px";
+            } else if (elmnt.offsetLeft + elmnt.offsetWidth > window.innerWidth) {
+                elmnt.style.left = window.innerWidth - elmnt.offsetWidth + "px";
+            }
+        }
+
+        function closeDragElement() {
+            document.onmouseup = nothing;
+            document.onmousemove = nothing;
+        }
+
+        function nothing() {
+
+        }
     }
 }

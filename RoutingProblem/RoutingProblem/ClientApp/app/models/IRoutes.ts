@@ -1,7 +1,7 @@
 ﻿import { Injectable } from '@angular/core';
 import { Http, HttpModule } from '@angular/http';
-import { IData } from './IData';
+import { IRoute } from './IRoute';
 
 export interface IRoutes {
-    route: IData[];
+    route: IRoute[];
 }

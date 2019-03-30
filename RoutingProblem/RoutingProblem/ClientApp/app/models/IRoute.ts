@@ -1,7 +1,11 @@
 ﻿import { Injectable } from '@angular/core';
 import { Http, HttpModule } from '@angular/http';
+import { INode } from './INode';
 
 export interface IRoute {
-    Lat: number;
-    Lon: number;
+    pocetHranCesty: number;
+    pocetNavstivenychHran: number;
+    dlzkaCesty: number;
+    casVypoctu: number;
+    nodes: INode[];
 }
