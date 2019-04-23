@@ -36,7 +36,7 @@
 
         <table>
             <tr>
-                <td width="50%">Dĺžka cesty:</td>
+                <td>Dĺžka cesty:</td>
                 <td>{{route.dlzkaCesty}} <span *ngIf="routesCount > -1">metrov</span></td>
             </tr>
             <tr>
@@ -48,13 +48,16 @@
                 <td>{{route.pocetHranCesty}}</td>
             </tr>
             <tr>
-                <td>Počet navštívených hrán:</td>
-                <td>{{route.pocetNavstivenychHran}}</td>
+                <td>Počet spracovaných vrcholov:</td>
+                <td>{{route.pocetSpracovanychVrcholov}}</td>
             </tr>
         </table>
 
         <div class="form-option">
-            <label id="lblOptions">Možnosti</label><br />
+            <div>
+                <label id="lblOptions">Možnosti</label>
+                <button type="button" (click)="statistics();closeForm();" class="labelRoute"><b>S</b></button><br />
+            </div>
             <div class="option">
                 <label>Algoritmus:</label><br />
                 <div class="row">
@@ -69,9 +72,6 @@
                         <input type="radio" name="type" value="labelset" [checked]="type === 'labelset'" (click)="type = 'labelset';modifyend();"> Label Set<br />
                         <input type="radio" name="type" value="duplexdijkster" [checked]="type === 'duplexdijkster'" (click)="type = 'duplexdijkster';modifyend();"> Duplex dijkstra<br />
                         <input id="k" type="text" placeholder="počet trás" *ngIf="type === 'multilabel'" (blur)="modifyend()" required>
-                        <!--<input type="radio" name="routeType" value="najkratsia" [checked]="routeType === 'najkratsia'" (click)="routeType = 'najkratsia'"> najkratšia<br>
-                        <input type="radio" name="routeType" value="najrychlejsia" [checked]="routeType === 'najrychlejsia'" (click)="routeType = 'najrychlejsia'"> najrýchlejšia<br>
-                        <input type="radio" name="routeType" value="najjednoduchsia" [checked]="routeType === 'najjednoduchsia'" (click)="routeType = 'najjednoduchsia'"> najjednoduchšia-->
                     </div>
                 </div>
                 <label>Zakázané manévre:</label><br />

@@ -21,22 +21,31 @@ namespace RoutingProblem.Services
             while (unsettledNodes.Count() != 0)
             {
                 currentNode = unsettledNodes.Dequeue();
+                currentNode.Unsettled = false;
 
-                foreach (KeyValuePair<NodeGraphDTO, double> edge in currentNode.NeighborNodeNavigation)
+                foreach (Edge edge in currentNode.Node.EdgeStartNodeNavigation)
                 {
-                    NodeGraphDTO adjacentNode = edge.Key;
-                    double edgeWeight = edge.Value;
+                    NodeGraphDTO adjacentNode = edge.EndNodeNavigation.NodeGraphDTO;
+                    double edgeWeight = edge.DistanceInMeters;
 
                     double sourceDistance = currentNode.CurrentDistance;
                     if (sourceDistance + edgeWeight < adjacentNode.CurrentDistance)
                     {
                         adjacentNode.CurrentDistance = sourceDistance + edgeWeight;
                         adjacentNode.PreviousNode = currentNode;
-                        unsettledNodes.Enqueue(adjacentNode);
+                        if (!adjacentNode.Unsettled)
+                        {
+                            unsettledNodes.Enqueue(adjacentNode);
+                            adjacentNode.Unsettled = true;
+                        }
                     }
-
-                    Utils.PocetNavstivenychHran++;
                 }
+                Utils.PocetSpracovanychVrcholov++;
+            }
+
+            if (endNode.PreviousNode == null)
+            {
+                return null;
             }
             return endNode;
         }

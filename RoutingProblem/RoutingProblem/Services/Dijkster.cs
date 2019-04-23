@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using RoutingProblem.Models;
 using RoutingProblem.Services.Data;
 
@@ -12,62 +12,60 @@ namespace RoutingProblem.Services
         public NodeGraphDTO CalculateShortestPath(NodeGraphDTO startNode, NodeGraphDTO endNode)
         {
             startNode.CurrentDistance = 0;
+            startNode.Unsettled = true;
 
             NodeGraphDTO currentNode = null;
-            HashSet<NodeGraphDTO> settledNodes = new HashSet<NodeGraphDTO>();
-            HashSet<NodeGraphDTO> unsettledNodes = new HashSet<NodeGraphDTO>();
+            BinaryTree unsettledTree = new BinaryTree(1);
+            unsettledTree.Add(startNode);
 
-            unsettledNodes.Add(startNode);
-
-            while (unsettledNodes.Count() != 0)
+            while (!unsettledTree.IsEmpty())
             {
-                currentNode = GetLowestDistanceNode(unsettledNodes);
+                currentNode = GetLowestDistanceNode(unsettledTree);
                 if (currentNode.Equals(endNode))
                 {
                     return currentNode;
                 }
-                unsettledNodes.Remove(currentNode);
-                foreach (KeyValuePair<NodeGraphDTO, double> edge in currentNode.NeighborNodeNavigation)
+                
+                foreach (Edge edge in currentNode.Node.EdgeStartNodeNavigation)
                 {
-                    NodeGraphDTO adjacentNode = edge.Key;
-                    double edgeWeight = edge.Value;
+                    NodeGraphDTO adjacentNode = edge.EndNodeNavigation.NodeGraphDTO;
+                    double edgeWeight = edge.DistanceInMeters;
                     
-                    if (!settledNodes.Contains(adjacentNode))
+                    if (!adjacentNode.Settled)
                     {
-                        CalculateMinimumDistance(adjacentNode, edgeWeight, currentNode);
-                        unsettledNodes.Add(adjacentNode);
-                        Utils.PocetNavstivenychHran++;
+                        CalculateMinimumDistance(adjacentNode, edgeWeight, currentNode, unsettledTree);
+                        if (!adjacentNode.Unsettled)
+                        {
+                            unsettledTree.Add(adjacentNode);
+                            adjacentNode.Unsettled = true;
+                        }
                     }
                 }
-                settledNodes.Add(currentNode);
+
+                Utils.PocetSpracovanychVrcholov++;
+                currentNode.Settled = true;
             }
             return null;
         }
 
-        private NodeGraphDTO GetLowestDistanceNode(HashSet<NodeGraphDTO> unsettledNodes)
+        private NodeGraphDTO GetLowestDistanceNode(BinaryTree unsettledTree)
         {
-            NodeGraphDTO lowestDistanceNode = null;
-            double lowestDistance = Double.MaxValue;
-            foreach (NodeGraphDTO node in unsettledNodes)
-            {
-                double nodeDistance = node.CurrentDistance;
-                if (nodeDistance < lowestDistance)
-                {
-                    lowestDistance = nodeDistance;
-                    lowestDistanceNode = node;
-                }
-            }
-            return lowestDistanceNode;
+            return unsettledTree.GetMin();
         }
 
-        private void CalculateMinimumDistance(NodeGraphDTO evaluationNode, double edgeWeigh, NodeGraphDTO sourceNode)
+        private void CalculateMinimumDistance(NodeGraphDTO evaluationNode, double edgeWeigh, NodeGraphDTO sourceNode, BinaryTree unsettledTree)
         {
             double sourceDistance = sourceNode.CurrentDistance;
             if (sourceDistance + edgeWeigh < evaluationNode.CurrentDistance)
             {
+                if (evaluationNode.Unsettled)
+                {
+                    evaluationNode.Unsettled = false;
+                    unsettledTree.Remove(evaluationNode);
+                }
                 evaluationNode.CurrentDistance = sourceDistance + edgeWeigh;
                 evaluationNode.PreviousNode = sourceNode;
             }
         }
-    }
+    }   
 }

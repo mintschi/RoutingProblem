@@ -14,44 +14,52 @@ namespace RoutingProblem.Services
             startNode.CurrentDistance = 0;
 
             NodeGraphDTO currentNode = null;
-            HashSet<NodeGraphDTO> settledNodes = new HashSet<NodeGraphDTO>();
-            HashSet<NodeGraphDTO> unsettledNodes = new HashSet<NodeGraphDTO>();
+            BinaryTree unsettledTree = new BinaryTree(1);
+            unsettledTree.Add(startNode);
 
-            unsettledNodes.Add(startNode);
-
-            while (unsettledNodes.Count() != 0)
+            while (!unsettledTree.IsEmpty())
             {
-                currentNode = unsettledNodes.OrderBy(n => n.CurrentDistance).First();
-                unsettledNodes.Remove(currentNode);
+                currentNode = unsettledTree.GetMin();
+                currentNode.Unsettled = false;
+
                 if (currentNode.Equals(endNode))
                 {
                     return currentNode;
                 }
 
-                foreach (KeyValuePair<NodeGraphDTO, double> edge in currentNode.NeighborNodeNavigation)
+                foreach (Edge edge in currentNode.Node.EdgeStartNodeNavigation)
                 {
-                    NodeGraphDTO adjacentNode = edge.Key;
-                    double edgeWeight = edge.Value;
+                    NodeGraphDTO adjacentNode = edge.EndNodeNavigation.NodeGraphDTO;
+                    double edgeWeight = edge.DistanceInMeters;
 
-                    if (!settledNodes.Contains(adjacentNode))
+                    if (!adjacentNode.Settled)
                     {
-                        CalculateMinimumDistance(adjacentNode, edgeWeight, currentNode, unsettledNodes);
-                        Utils.PocetNavstivenychHran++;
+                        CalculateMinimumDistance(adjacentNode, edgeWeight, currentNode, unsettledTree);
                     }
                 }
-                settledNodes.Add(currentNode);
+                Utils.PocetSpracovanychVrcholov++;
+                currentNode.Settled = true;
             }
             return null;
         }
 
-        private void CalculateMinimumDistance(NodeGraphDTO evaluationNode, double edgeWeigh, NodeGraphDTO sourceNode, HashSet<NodeGraphDTO> unsettledNodes)
+        private void CalculateMinimumDistance(NodeGraphDTO evaluationNode, double edgeWeigh, NodeGraphDTO sourceNode, BinaryTree unsettledTree)
         {
             double sourceDistance = sourceNode.CurrentDistance;
             if (sourceDistance + edgeWeigh < evaluationNode.CurrentDistance)
             {
+                if (evaluationNode.Unsettled)
+                {
+                    evaluationNode.Unsettled = false;
+                    unsettledTree.Remove(evaluationNode);
+                }
                 evaluationNode.CurrentDistance = sourceDistance + edgeWeigh;
                 evaluationNode.PreviousNode = sourceNode;
-                unsettledNodes.Add(evaluationNode);
+                if (!evaluationNode.Unsettled)
+                {
+                    unsettledTree.Add(evaluationNode);
+                    evaluationNode.Unsettled = true;
+                }
             }
         }
     }

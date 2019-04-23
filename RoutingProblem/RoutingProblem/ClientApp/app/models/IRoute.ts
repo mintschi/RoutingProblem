@@ -4,7 +4,7 @@ import { INode } from './INode';
 
 export interface IRoute {
     pocetHranCesty: number;
-    pocetNavstivenychHran: number;
+    pocetSpracovanychVrcholov: number;
     dlzkaCesty: number;
     casVypoctu: number;
     nodes: INode[];

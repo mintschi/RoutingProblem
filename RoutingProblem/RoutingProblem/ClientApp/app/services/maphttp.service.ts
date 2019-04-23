@@ -4,6 +4,7 @@ import { IRoute } from '../models/IRoute';
 import 'rxjs/add/operator/toPromise';
 import { IRoutes } from '../models/IRoutes';
 import { IField } from '../models/IField';
+import { IStatistics } from '../models/IStatistics';
 
 @Injectable()
 export class MapHttpService {
@@ -46,6 +47,12 @@ export class MapHttpService {
     loadFields(): Promise<any> {
         return this._http.get('/api/Route/fields')
             .map((response: Response) => response.json() as Array<IField>)
+            .toPromise();
+    }
+
+    statistics(): Promise<any> {
+        return this._http.get('/api/Route/statistics')
+            .map((response: Response) => response.json() as IStatistics)
             .toPromise();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoutingProblem.Models
 {
@@ -19,5 +20,8 @@ namespace RoutingProblem.Models
         public virtual Data IdDataNavigation { get; set; }
         public virtual ICollection<Edge> EdgeEndNodeNavigation { get; set; }
         public virtual ICollection<Edge> EdgeStartNodeNavigation { get; set; }
+
+        [NotMapped]
+        public NodeGraphDTO NodeGraphDTO { get; set; }
     }
 }

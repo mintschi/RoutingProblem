@@ -15,16 +15,16 @@ namespace RoutingProblem.Services
             NodeGraphDTO currentNode = null;
             bool repeat = true;
 
-            while(repeat)
+            while (repeat)
             {
                 repeat = false;
                 foreach (KeyValuePair<Node, NodeGraphDTO> node in nodes)
                 {
                     currentNode = node.Value;
-                    foreach (KeyValuePair<NodeGraphDTO, double> edge in node.Value.NeighborNodeNavigation)
+                    foreach (Edge edge in currentNode.Node.EdgeStartNodeNavigation)
                     {
-                        NodeGraphDTO adjacentNode = edge.Key;
-                        double edgeWeight = edge.Value;
+                        NodeGraphDTO adjacentNode = edge.EndNodeNavigation.NodeGraphDTO;
+                        double edgeWeight = edge.DistanceInMeters;
 
                         double sourceDistance = currentNode.CurrentDistance;
                         if (sourceDistance + edgeWeight < adjacentNode.CurrentDistance)
@@ -33,12 +33,15 @@ namespace RoutingProblem.Services
                             adjacentNode.PreviousNode = currentNode;
                             repeat = true;
                         }
-
-                        Utils.PocetNavstivenychHran++;
                     }
+                    Utils.PocetSpracovanychVrcholov++;
                 }
             }
-            
+
+            if (endNode.PreviousNode == null)
+            {
+                return null;
+            }
             return endNode;
         }
 
@@ -54,10 +57,10 @@ namespace RoutingProblem.Services
                 foreach (NodeDisabledMovementDTO node in nodes)
                 {
                     currentNode = node;
-                    foreach (KeyValuePair<NodeGraphDTO, double> edge in node.NeighborNodeNavigation)
+                    foreach (Edge edge in currentNode.Node.EdgeStartNodeNavigation)
                     {
-                        NodeGraphDTO adjacentNode = edge.Key;
-                        double edgeWeight = edge.Value;
+                        NodeGraphDTO adjacentNode = PrepareData.NodesGraph[edge.EndNodeNavigation];
+                        double edgeWeight = edge.DistanceInMeters;
 
                         double sourceDistance = currentNode.CurrentDistance;
                         if (sourceDistance + edgeWeight < adjacentNode.CurrentDistance)
@@ -67,7 +70,7 @@ namespace RoutingProblem.Services
                             repeat = true;
                         }
 
-                        Utils.PocetNavstivenychHran++;
+                        Utils.PocetSpracovanychVrcholov++;
                     }
                 }
             }

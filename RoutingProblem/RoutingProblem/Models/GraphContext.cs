@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using RoutingProblem.Services.Data;
 
 namespace RoutingProblem.Models
 {
@@ -26,7 +27,7 @@ namespace RoutingProblem.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseLazyLoadingProxies().UseSqlServer("Server=mainpc\\sqlexpress;Database=DopravnaSiet;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=mainpc\\sqlexpress;Database=DopravnaSiet;Trusted_Connection=True;");
             }
         }
 
@@ -62,6 +63,9 @@ namespace RoutingProblem.Models
                     .HasColumnName("active");
             });
 
+            modelBuilder.Entity<Data>()
+            .ForSqlServerIsMemoryOptimized();
+
             modelBuilder.Entity<Edge>(entity =>
             {
                 entity.HasKey(e => e.IdEdge)
@@ -78,8 +82,6 @@ namespace RoutingProblem.Models
                 entity.Property(e => e.EndNode)
                     .HasColumnName("end_node")
                     .HasColumnType("decimal(15, 0)");
-
-                entity.Property(e => e.MaxSpeed).HasColumnName("max_speed");
 
                 entity.Property(e => e.StartNode)
                     .HasColumnName("start_node")
@@ -108,6 +110,9 @@ namespace RoutingProblem.Models
                     .HasConstraintName("FK__Edge__start_node__4E88ABD4");
             });
 
+            modelBuilder.Entity<Edge>()
+            .ForSqlServerIsMemoryOptimized();
+
             modelBuilder.Entity<Node>(entity =>
             {
                 entity.HasKey(e => e.IdNode)
@@ -131,6 +136,9 @@ namespace RoutingProblem.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Node__id_data__6BAEFA67");
             });
+
+            modelBuilder.Entity<Node>()
+            .ForSqlServerIsMemoryOptimized();
 
             modelBuilder.Entity<DisabledMovement>(entity =>
             {
@@ -171,6 +179,8 @@ namespace RoutingProblem.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__DisabledM__end_e__09A971A2");
             });
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

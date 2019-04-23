@@ -9,10 +9,6 @@ namespace RoutingProblem.Models
     {
         public NodeGraphDTO()
         {
-            EdgeNavigation = new HashSet<Edge>();
-            EdgeNavigationR = new HashSet<Edge>();
-            NeighborNodeNavigation = new Dictionary<NodeGraphDTO, double>();
-            NeighborNodeNavigationR = new Dictionary<NodeGraphDTO, double>();
             MultiLabelMark = new List<MultiLabelMark>();
         }
 
@@ -31,9 +27,9 @@ namespace RoutingProblem.Models
         //multi label
         public List<MultiLabelMark> MultiLabelMark { get; set; }
 
-        public ICollection<Edge> EdgeNavigation { get; set; }
-        public ICollection<Edge> EdgeNavigationR { get; set; }
-        public Dictionary<NodeGraphDTO, double> NeighborNodeNavigation { get; set; }
-        public Dictionary<NodeGraphDTO, double> NeighborNodeNavigationR { get; set; }
+        public bool Settled { get; set; }
+        public bool Unsettled { get; set; }
+        public bool SettledR { get; set; }
+        public bool UnsettledR { get; set; }
     }
 }

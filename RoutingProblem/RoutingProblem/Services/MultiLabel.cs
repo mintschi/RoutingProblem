@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RoutingProblem.Models;
+using RoutingProblem.Services.Data;
 
 namespace RoutingProblem.Services
 {
@@ -15,17 +16,16 @@ namespace RoutingProblem.Services
             startNode.MultiLabelMark.Add(new MultiLabelMark(0, 0, null, 0));
 
             MultiLabelMarkQueue currentMark = null;
-            HashSet<MultiLabelMarkQueue> unsettledNodes = new HashSet<MultiLabelMarkQueue>();
+            BinaryTree unsettledTree = new BinaryTree();
 
-            foreach (KeyValuePair<NodeGraphDTO, double> edge in startNode.NeighborNodeNavigation)
+            foreach (Edge edge in startNode.Node.EdgeStartNodeNavigation)
             {
-                unsettledNodes.Add(new MultiLabelMarkQueue(edge.Key, edge.Value, startNode, 0));
+                unsettledTree.Add(new MultiLabelMarkQueue(edge.EndNodeNavigation.NodeGraphDTO, edge.DistanceInMeters, startNode, 0));
             }
 
-            while (unsettledNodes.Count() != 0 && endNode.MultiLabelMark.Count < K)
+            while (!unsettledTree.IsEmpty() && endNode.MultiLabelMark.Count < K)
             {
-                currentMark = GetLowestDistanceNode(unsettledNodes);
-                unsettledNodes.Remove(currentMark);
+                currentMark = GetLowestDistanceNode(unsettledTree);
 
                 int k = currentMark.W.MultiLabelMark.Count;
                 if (k < K)
@@ -33,11 +33,11 @@ namespace RoutingProblem.Services
                     k++;
                     currentMark.W.MultiLabelMark.Add(new MultiLabelMark(k, currentMark.T, currentMark.X, currentMark.Xk));
 
-                    foreach (KeyValuePair<NodeGraphDTO, double> edge in currentMark.W.NeighborNodeNavigation)
+                    foreach (Edge edge in currentMark.W.Node.EdgeStartNodeNavigation)
                     {
-                        if (!PathContainsNode(edge.Key, currentMark.W, k))
+                        if (!PathContainsNode(edge.EndNodeNavigation.NodeGraphDTO, currentMark.W, k))
                         {
-                            unsettledNodes.Add(new MultiLabelMarkQueue(edge.Key, currentMark.T + edge.Value, currentMark.W, k));
+                            unsettledTree.Add(new MultiLabelMarkQueue(edge.EndNodeNavigation.NodeGraphDTO, currentMark.T + edge.DistanceInMeters, currentMark.W, k));
                         }
                     }
                 }
@@ -63,20 +63,9 @@ namespace RoutingProblem.Services
             return false;
         }
 
-        private MultiLabelMarkQueue GetLowestDistanceNode(HashSet<MultiLabelMarkQueue> unsettledNodes)
+        private MultiLabelMarkQueue GetLowestDistanceNode(BinaryTree unsettledTree)
         {
-            MultiLabelMarkQueue lowestDistanceMark = null;
-            double lowestDistance = Double.MaxValue;
-            foreach (MultiLabelMarkQueue mark in unsettledNodes)
-            {
-                double nodeDistance = mark.T;
-                if (nodeDistance < lowestDistance)
-                {
-                    lowestDistance = nodeDistance;
-                    lowestDistanceMark = mark;
-                }
-            }
-            return lowestDistanceMark;
+            return unsettledTree.GetMinMultiLabel();
         }
     }
 }

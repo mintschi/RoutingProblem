@@ -1,7 +1,7 @@
 ﻿import { MapHttpService } from '../../services/maphttp.service';
 import { Component, OnInit } from '@angular/core';
 import { Event } from '@angular/router';
-import { forEach } from '@angular/router/src/utils/collection';
+import { forEach, last } from '@angular/router/src/utils/collection';
 import { Observable } from 'rxjs/Observable';
 import { IRoute } from '../../models/IRoute';
 import 'rxjs/add/operator/map';
@@ -12,6 +12,7 @@ import { INode } from '../../models/INode';
 import { IField } from '../../models/IField';
 import { Title } from '@angular/platform-browser';
 import { assertNotNull } from '@angular/compiler/src/output/output_ast';
+import { IStatistics } from '../../models/IStatistics';
 
 declare var ol: any;
 
@@ -48,8 +49,6 @@ export class MapComponent implements OnInit {
 
     ngOnInit() {
         this.titleService.setTitle("Problémy trasovania");
-        var latitude: number = 49.2122189;
-        var longitude: number = 18.7486345;
         var name: number = 0;
 
         var raster = new ol.layer.Tile({
@@ -328,19 +327,27 @@ export class MapComponent implements OnInit {
         this.service.loadFields()
             .then((response: Array<IField>) => {
                 this.fields = response;
-                this.selectedField = this.fields[0];
-                this.addExtent();
+                if (this.fields.length != 0) {
+                    this.selectedField = this.fields[0];
+                    this.addExtent();
+                }
+            });
+    }
+
+    public statistic: IStatistics = new Object() as IStatistics;
+    statistics() {
+        this.service.statistics()
+            .then((response: IStatistics) => {
+                this.statistic = response;
             });
     }
 
     openForm() {
         this.show = true;
-        //(<HTMLDivElement>document.getElementById('map')).style.width = 'calc(100vw - 360px)';
     }
 
     closeForm() {
         this.show = false;
-        //(<HTMLDivElement>document.getElementById('map')).style.width = '100vw';
     }
 
     //extent

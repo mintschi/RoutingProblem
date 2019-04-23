@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoutingProblem.Models
 {
@@ -10,7 +11,6 @@ namespace RoutingProblem.Models
         public decimal StartNode { get; set; }
         public decimal EndNode { get; set; }
         public double DistanceInMeters { get; set; }
-        public int? MaxSpeed { get; set; }
 
         public virtual Data IdDataNavigation { get; set; }
         public virtual Node EndNodeNavigation { get; set; }

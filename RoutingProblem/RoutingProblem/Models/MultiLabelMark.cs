@@ -8,7 +8,7 @@ namespace RoutingProblem.Models
 {
     public class MultiLabelMark
     {
-        public MultiLabelMark (int k, double t, NodeGraphDTO x, int xk)
+        public MultiLabelMark(int k, double t, NodeGraphDTO x, int xk)
         {
             K = k;
             T = t;

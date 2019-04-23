@@ -12,7 +12,7 @@ namespace RoutingProblem.Models
         }
 
         public Int32 PocetHranCesty { get; set; }
-        public Int32 PocetNavstivenychHran { get; set; }
+        public Int32 PocetSpracovanychVrcholov { get; set; }
         public double DlzkaCesty { get; set; }
         public double CasVypoctu { get; set; }
         public LinkedList<NodeLocationDTO> Nodes { get; set; }
